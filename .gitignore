@@ -1,0 +1,6 @@
+__pycache__/
+*.json
+*.docx
+*.rar
+*.pickle
+Visualizer/compiled_computed_tags.js
