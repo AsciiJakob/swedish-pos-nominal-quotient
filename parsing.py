@@ -9,7 +9,7 @@ stripParanthesis = False
 # Regex pattern. 11 segments of data seperated by space and start/ending with < and >
 metadata_pattern = re.compile(r"<(\w+)\s+(\w+)\s+(\w+)\s+(\w+)\s+(\w)\s+(\w)\s+(\w+)\s+(\w+)\s+(\w)\s+(\w)\s+(\w)>")
 
-def getFolderDocxFiles(folderPath):
+def get_folder_docx_files(folderPath):
     onlyfiles = [f for f in listdir(folderPath) if isfile(join(folderPath, f))]
     output = []
     for file in onlyfiles:
@@ -39,7 +39,7 @@ def extract_metadata(metadata_line):
         }
         return metadata
 
-def parseFile(filePath, writeDebugFile):
+def parse_file(filePath, writeDebugFile):
     document = Document(filePath)
 
     textIndx = -1 # start at -1 so that it becomes 0 for the first actual text after it gets incremented for the first metadata

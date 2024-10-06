@@ -1,5 +1,6 @@
 from segmentation import segmentize_to_sentences
-from parsing import parseFile, getFolderDocxFiles
+from parsing import parse_file, get_folder_docx_files
+import metrics as metrics
 # from pos_kb_bert import pos_tag
 # from pos_flair import pos_tag
 import json
@@ -33,12 +34,12 @@ for modelIndx, currentModel in enumerate(selectedModels):
 
     #loop through files
     # loop through texts thing  
-    docxFiles = getFolderDocxFiles("input/")
+    docxFiles = get_folder_docx_files("input/")
     print("docxfiles: ", docxFiles)
 
     outputData = []
     for fileIndx, textsfile in enumerate(docxFiles):
-        texts = parseFile(textsfile["fullPath"], True)
+        texts = parse_file(textsfile["fullPath"], True)
         outputData.append({"filename": textsfile["filename"], "texts": []})
         for textI, text in enumerate(texts):
             sentenceAggregation = []
@@ -48,8 +49,18 @@ for modelIndx, currentModel in enumerate(selectedModels):
                 sentenceAggregation.append(POSModule.pos_tag(sentence))
                 print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] file: {textsfile["filename"]} [{fileIndx+1}/{len(docxFiles)}] text: [{textI+1}/{len(texts)}] sentence: [{sentenceI + 1}/{len(sentences)}]", end='\r')
                 #wclass = result["entity_group"]
+            
+            nominalQuotient = metrics.nominal_quotient(sentenceAggregation)
+            wordCount = metrics.count_words(text["text"])
 
-            outputData[fileIndx]["texts"].append({"id": text["id"], "sentences": sentenceAggregation})
+            outputData[fileIndx]["texts"].append({
+                "id": text["id"],
+                "full_nominal_quotient": nominalQuotient["full"],
+                "simple_nominal_quotient": nominalQuotient["simple"],
+                "word_count": wordCount,
+                "mean_sentence_length": wordCount/len(sentences),
+                "sentences": sentenceAggregation,
+            })
 
         print(f"Model {currentModel} finished processing file {textsfile["filename"]}.docx in {round(time.time()-beginTimestamp, 2)} seconds\n")
 

@@ -5,16 +5,19 @@
     </head>
     <body>
         <div id="sideData">
-            <h3 id="fullNominalkvot">laddar</h3>
-            <h3 id="enkelNominalkvot">laddar</h3>
-            <h3 id="antalVerbSubst">laddar</h3>
+            <h3 id="fullNominalQuotient">laddar</h3>
+            <h3 id="simpleNominalQuotient">laddar</h3>
+            <h3 id="verbNounCount">laddar</h3>
+            <h3 id="wordCount">laddar</h3>
+            <h3 id="meanSentenceLength">laddar</h3>
             <div id="settingsContainer">
                 <fieldset id="modelSelector">
                     <legend>Ordklasstaggningsmodell:</legend>
                     <!-- <input type="radio" name="model" id="flair"> <label for="flair">Flair</label>
                     <input type="radio" name="model" id="kb_bert"> <label for="kb_bert">KB-Bert</label> -->
                 </fieldset>
-                <select id="fileSelector" size="10" name="fileID"></select>
+                <legend>År/betyg, text</legend>
+                <select id="fileSelector" size="10" name="fileID"><option>test</option><option>test</option></select>
                 <select id="textSelector" size="10" name="textID"></select>
             </div>
             
@@ -90,13 +93,16 @@ function handleSetting(settingElement) {
         }
         currentTextID = settingElement.value;
         updateURL();
+        setSettingsVisuals();
         renderSentences();
     }
 }
 
 function setSettingsVisuals() {
+
     // add file names
     const fileSelector = document.getElementById("fileSelector");
+    const oldValue = fileSelector.value;
     fileSelector.innerText = "";
     for (fileIndex in dataFile[currentModel]) {
         const file = dataFile[currentModel][fileIndex];
@@ -106,6 +112,8 @@ function setSettingsVisuals() {
         fileOption.innerText = file.filename;
         fileSelector.appendChild(fileOption);
     }
+    fileSelector.value = oldValue;
+
 
     // add texts
     const textSelector = document.getElementById("textSelector");
@@ -123,6 +131,9 @@ function setSettingsVisuals() {
     // add models
     const modelSelector = document.getElementById("modelSelector");
     modelSelector.innerText = "";
+    const legend = document.createElement("legend");
+    legend.innerText = "Ordklasstaggningsmodell:"
+    modelSelector.appendChild(legend);
     for (modelName of Object.keys(dataFile)) {
         const modelElement = document.createElement("input");
         modelElement.id = modelName;
@@ -145,9 +156,7 @@ function setSettingsVisuals() {
 
 function renderSentences() {
     const sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences
-    let countNumerator = 0;
     let countNouns = 0;
-    let countDenominator = 0;
     let countVerbs = 0;
 
     textContent.innerText = "";
@@ -163,11 +172,9 @@ function renderSentences() {
 
             if (numerator.includes(word.entity_group)) {
                 wordDiv.classList+=" numerator"
-                countNumerator++;
             }
             if (denominator.includes(word.entity_group)) {
                 wordDiv.classList+=" denominator"
-                countDenominator++;
             }
 
             if (word.entity_group == "NN")
@@ -192,13 +199,14 @@ function renderSentences() {
         textContent.appendChild(spacer);
     }
 
-    document.getElementById("fullNominalkvot").innerText = "Full nominalkvot: "+(countNumerator/countDenominator);
-    document.getElementById("enkelNominalkvot").innerText = "Enkel nominalkvot: "+(countNouns/countVerbs)
-    document.getElementById("antalVerbSubst").innerText = "Verb: "+countVerbs+" substantiv: "+countNouns;
+    // set metric values
+    const currentText = dataFile[currentModel][currentFile].texts[currentTextID];
+    document.getElementById("verbNounCount").innerText = "Verb: "+countVerbs+" substantiv: "+countNouns;
+    document.getElementById("fullNominalQuotient").innerText = "Full nominalkvot: " + currentText.full_nominal_quotient;
+    document.getElementById("simpleNominalQuotient").innerText = "Enkel nominalkvot: " + currentText.simple_nominal_quotient;
+    document.getElementById("wordCount").innerText = "Antal ord: " + currentText.word_count;
+    document.getElementById("meanSentenceLength").innerText = "Genomsnittlig meningslängd: " + currentText.mean_sentence_length;
 }
-
-
-
 
 </script>
 
@@ -209,10 +217,12 @@ body {
 #sideData {
     width: 20%;
     float: right;
-    /* position: sticky; */
     position: fixed;
     top: 0;
     right:0;
+}
+#fileSelector {
+    width: 10%;
 }
 #textSelector {
     width: 20%;
@@ -222,15 +232,13 @@ body {
   width: 40%;
   font-size: 1.5em;
 }
-    /* Tooltip container */
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  border-bottom: 1px dotted black;
   white-space: pre;
 }
 
-/* Tooltip text */
 .tooltip .tooltipText {
   visibility: hidden;
   width: 120px;
@@ -240,12 +248,10 @@ body {
   padding: 5px 0;
   border-radius: 6px;
  
-  /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
 }
 
-/* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltipText {
   visibility: visible;
 }
@@ -262,15 +268,13 @@ body {
 }
 
 
-
-
-
-
 .category-table {
     border-collapse: collapse;
     width: 250px; /* Adjust width as needed */
-    float: left;
     margin-right: 20px; /* Space between table and rest of the content */
+
+    float: left;
+    position: fixed;
 }
 
 .category-table th, .category-table td {
@@ -282,7 +286,5 @@ body {
 .category-table th {
     background-color: #f2f2f2;
 }
-
-
 
 </style>
