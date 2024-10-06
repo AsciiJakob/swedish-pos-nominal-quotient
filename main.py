@@ -10,11 +10,13 @@ import importlib
 
 availableModels = ["flair", "kb_bert", "kb_bert_aggregation", "kb_bert_test"]
 
-selectedModels = ["flair"] # set default model
+selectedModels = ["kb_bert"] # set default model
 if (len(sys.argv) > 1):
     selectedModels = sys.argv[1].split(",")
     if (selectedModels[0] == "all"):
         selectedModels = availableModels
+    if (selectedModels[0] == "none"):
+        skipProcessing = True
 
 # Model loop 
 for modelIndx, currentModel in enumerate(selectedModels):
@@ -39,7 +41,7 @@ for modelIndx, currentModel in enumerate(selectedModels):
 
     outputData = []
     for fileIndx, textsfile in enumerate(docxFiles):
-        texts = parse_file(textsfile["fullPath"], True)
+        texts = parse_file(textsfile["fullPath"], False)
         outputData.append({"filename": textsfile["filename"], "texts": []})
         for textI, text in enumerate(texts):
             sentenceAggregation = []
