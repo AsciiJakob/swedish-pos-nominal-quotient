@@ -102,7 +102,9 @@ function setSettingsVisuals() {
 
     // add file names
     const fileSelector = document.getElementById("fileSelector");
-    const oldValue = fileSelector.value;
+    let oldValue = fileSelector.value;
+    if (!oldValue)
+        oldValue = currentFile || 0;
     fileSelector.innerText = "";
     for (fileIndex in dataFile[currentModel]) {
         const file = dataFile[currentModel][fileIndex];
@@ -112,6 +114,7 @@ function setSettingsVisuals() {
         fileOption.innerText = file.filename;
         fileSelector.appendChild(fileOption);
     }
+    console.log("setting value to", oldValue);
     fileSelector.value = oldValue;
 
 
