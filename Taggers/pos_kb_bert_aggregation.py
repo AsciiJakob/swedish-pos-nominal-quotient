@@ -1,13 +1,20 @@
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 from transformers import pipeline
 import json
+import torch
+
+# Check if GPU is available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 # Load the tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained("KB/bert-base-swedish-cased-pos")
 model = AutoModelForTokenClassification.from_pretrained("KB/bert-base-swedish-cased-pos")
 
 # Create the pipeline for POS tagging
-pos_pipeline = pipeline("token-classification", model=model, tokenizer=tokenizer, aggregation_strategy="first")
+useDevice = 0 if torch.cuda.is_available() else -1
+pos_pipeline = pipeline("token-classification", model=model, tokenizer=tokenizer, device=useDevice, aggregation_strategy="first")
+
 
 
 

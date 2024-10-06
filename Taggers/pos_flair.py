@@ -4,12 +4,12 @@ from flair.models import SequenceTagger
 from flair.splitter import SegtokSentenceSplitter
 import time
 
-
 tagger = SequenceTagger.load("Z:/Programming/Phyton/sprakanalys/Flair/flair_full/final-model.pt")
 print("loaded tagger!")
 
 # sentence = Sentence("Jag fick en såg i julklapp!")
 # sentence = Sentence('George Washington went to Washington.')
+
 
 def pos_tag(sentence):
     sentence = Sentence(sentence)

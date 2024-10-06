@@ -1,4 +1,5 @@
 from segmentation import segmentize_to_sentences
+from parsing import parseFile, getFolderDocxFiles
 # from pos_kb_bert import pos_tag
 # from pos_flair import pos_tag
 import json
@@ -8,17 +9,16 @@ import importlib
 
 availableModels = ["flair", "kb_bert", "kb_bert_aggregation", "kb_bert_test"]
 
-selectedModels = []
+selectedModels = ["flair"] # set default model
 if (len(sys.argv) > 1):
     selectedModels = sys.argv[1].split(",")
     if (selectedModels[0] == "all"):
         selectedModels = availableModels
-else:
-    selectedModels[0] = "flair"
 
+# Model loop 
 for modelIndx, currentModel in enumerate(selectedModels):
     try:
-        POSModule = importlib.import_module("./Taggers/pos_"+currentModel)
+        POSModule = importlib.import_module("Taggers.pos_"+currentModel)
         print("Using model "+currentModel)
     except:
         print("failed to load POS library called: "+currentModel)
@@ -26,25 +26,35 @@ for modelIndx, currentModel in enumerate(selectedModels):
     beginTimestamp = time.time()
 
 
-    with open("14 A.json") as f:
-        textsFile = json.load(f)
+    # # load text 
+    # with open("14 A.json") as f:
+    #     textsFile = json.load(f)
+    
 
-    outputTexts = []
-    for textI, text in enumerate(textsFile):
-        sentenceAggregation = []
+    #loop through files
+    # loop through texts thing  
+    docxFiles = getFolderDocxFiles("input/")
+    print("docxfiles: ", docxFiles)
 
-        sentences = segmentize_to_sentences(text["text"])
-        for sentenceI, sentence in enumerate(sentences):
-            sentenceAggregation.append(POSModule.pos_tag(sentence))
-            print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] text: [{textI+1}/{len(textsFile)}] sentence: [{sentenceI + 1}/{len(sentences)}]", end='\r')
-            #wclass = result["entity_group"]
+    outputData = []
+    for fileIndx, textsfile in enumerate(docxFiles):
+        texts = parseFile(textsfile["fullPath"], True)
+        outputData.append({"filename": textsfile["filename"], "texts": []})
+        for textI, text in enumerate(texts):
+            sentenceAggregation = []
 
-        outputTexts.append({"id": text["id"], "sentences": sentenceAggregation})
+            sentences = segmentize_to_sentences(text["text"])
+            for sentenceI, sentence in enumerate(sentences):
+                sentenceAggregation.append(POSModule.pos_tag(sentence))
+                print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] file: {textsfile["filename"]} [{fileIndx+1}/{len(docxFiles)}] text: [{textI+1}/{len(texts)}] sentence: [{sentenceI + 1}/{len(sentences)}]", end='\r')
+                #wclass = result["entity_group"]
 
-    print("Model ", currentModel, " processing completed in ", round(time.time()-beginTimestamp, 2), " seconds.")
+            outputData[fileIndx]["texts"].append({"id": text["id"], "sentences": sentenceAggregation})
+
+        print(f"Model {currentModel} finished processing file {textsfile["filename"]}.docx in {round(time.time()-beginTimestamp, 2)} seconds\n")
 
     with open("output/computed_tags_"+currentModel+".json", "w") as json_file:
-        json.dump(outputTexts, json_file, indent=4)  # "indent" for pretty-printing
+        json.dump(outputData, json_file, indent=4)  # "indent" for pretty-printing
 
 with open("Visualizer/compiled_computed_tags.js", "w") as jsFile:
     jsFile.write("const dataFile = {};\n")

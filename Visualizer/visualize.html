@@ -14,9 +14,8 @@
                     <!-- <input type="radio" name="model" id="flair"> <label for="flair">Flair</label>
                     <input type="radio" name="model" id="kb_bert"> <label for="kb_bert">KB-Bert</label> -->
                 </fieldset>
-                <select id="textSelector" size="10" name="textID">
-
-                </select>
+                <select id="fileSelector" size="10" name="fileID"></select>
+                <select id="textSelector" size="10" name="textID"></select>
             </div>
             
         </div>
@@ -35,16 +34,18 @@ const numerator = ["NN", "PM", "PP", "PC"];
 const denominator = ["PN", "PS", "VB", "AB"];
 
 const params = new URLSearchParams(window.location.search);
-let currentModel = params.get("model") || "flair"
+let currentModel = params.get("model") || Object.keys(dataFile)[0];
+let currentFile = params.get("fileID") || 0 
 let currentTextID = params.get("textID") || 0;
 updateURL();
 setSettingsVisuals();
 
-renderSentences(dataFile[currentModel][currentTextID].sentences);
+renderSentences();
 
 // store application states in url since refreshing is great but losing your state isn't.
 function updateURL() {
-    const newUrl = `?model=${encodeURIComponent(currentModel)}&textID=${encodeURIComponent(currentTextID)}`;
+    // const newUrl = `?model=${encodeURIComponent(currentModel)}&textID=${encodeURIComponent(currentTextID)}`;
+    const newUrl = `?model=${encodeURIComponent(currentModel)}&fileID=${encodeURIComponent(currentFile)}&textID=${encodeURIComponent(currentTextID)}`;
     window.history.pushState(null, '', newUrl);
 }
 
@@ -57,7 +58,7 @@ function handleSetting(settingElement) {
             alert("Det finns ingen data från modellen i datafilen.");
             return;
         }
-        if (dataFile[settingElement.id].length-1 < currentTextID) {
+        if (dataFile[settingElement.id][currentFile].texts.length-1 < currentTextID) {
                 // alert("Den för närvarande valda texten har inte analyserats med denna modell.");
                 // doment.getElementById(currentModel).checked = true;
                 // return;
@@ -66,27 +67,51 @@ function handleSetting(settingElement) {
         currentModel = settingElement.id;
         updateURL();
         setSettingsVisuals(); // update the text options to match current model (in case they have anaylized different corpuses)
-        renderSentences(dataFile[currentModel][currentTextID].sentences);
+        renderSentences();
     }
-    console.log(settingElement);
-    if (settingElement.name == "textID") {
+
+
+    if (settingElement.name == "fileID") {
         if (dataFile[currentModel].length-1 < settingElement.value) {
+            alert("Något gick snett");
+            return;
+        }
+        currentFile = settingElement.value;
+        updateURL();
+        setSettingsVisuals();
+        renderSentences();
+    };
+
+
+    if (settingElement.name == "textID") {
+        if (dataFile[currentModel][currentFile].texts.length-1 < settingElement.value) {
             alert("Den här texten har inte analyserats med den modell som är vald.");
             return;
         }
         currentTextID = settingElement.value;
         updateURL();
-        renderSentences(dataFile[currentModel][currentTextID].sentences);
+        renderSentences();
     }
 }
 
 function setSettingsVisuals() {
+    // add file names
+    const fileSelector = document.getElementById("fileSelector");
+    fileSelector.innerText = "";
+    for (fileIndex in dataFile[currentModel]) {
+        const file = dataFile[currentModel][fileIndex];
+        fileOption = document.createElement("option");
+        fileOption.value = fileIndex;
+        fileOption.name = "fileID";
+        fileOption.innerText = file.filename;
+        fileSelector.appendChild(fileOption);
+    }
 
     // add texts
     const textSelector = document.getElementById("textSelector");
     textSelector.innerText = "";
-    for (textIndex in dataFile[currentModel]) {
-        const text = dataFile[currentModel][textIndex];
+    for (textIndex in dataFile[currentModel][currentFile].texts) {
+        const text = dataFile[currentModel][currentFile].texts[textIndex];
         textOption = document.createElement("option");
         textOption.value = textIndex;
         textOption.name = "textID";
@@ -118,13 +143,12 @@ function setSettingsVisuals() {
     document.getElementById("textSelector").value = currentTextID;
 }
 
-function renderSentences(sentences) {
+function renderSentences() {
+    const sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences
     let countNumerator = 0;
     let countNouns = 0;
     let countDenominator = 0;
     let countVerbs = 0;
-
-    console.log(sentences)
 
     textContent.innerText = "";
     for (sentence of sentences) {
