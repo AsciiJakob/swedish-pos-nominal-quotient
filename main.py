@@ -66,14 +66,14 @@ for modelIndx, currentModel in enumerate(selectedModels):
 
         print(f"Model {currentModel} finished processing file {textsfile["filename"]}.docx in {round(time.time()-beginTimestamp, 2)} seconds\n")
 
-    with open("output/computed_tags_"+currentModel+".json", "w") as json_file:
+    with open("output/computed_"+currentModel+".json", "w") as json_file:
         json.dump(outputData, json_file, indent=4)  # "indent" for pretty-printing
 
-with open("Visualizer/compiled_computed_tags.js", "w") as jsFile:
+with open("Visualizer/computed_compilation.js", "w") as jsFile:
     jsFile.write("const dataFile = {};\n")
     for i, model in enumerate(availableModels):
         try:
-            with open("output/computed_tags_"+model+".json") as f:
+            with open("output/computed_"+model+".json") as f:
                 modelComputedTags = json.load(f)
         except:
             print("tag compilation ignoring uncomputed tags for model "+model)
