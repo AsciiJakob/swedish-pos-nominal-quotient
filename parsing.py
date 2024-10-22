@@ -5,6 +5,31 @@ from os import listdir
 from os.path import isfile, join
 stripParanthesis = False 
 
+# remove everything within paranthesis
+def removeParanthesis(text, textobj):
+    leftParantCount = text.count("(")
+    if (stripParanthesis and leftParantCount > 0):
+        if (leftParantCount == text.count(")")):
+            pattern = r'\([^()]*\)' 
+            while re.search(pattern, text):
+                text = re.sub(pattern, '', text) # remove everything everything between paranthesis
+        else:
+            print("Note: found unclosed paranthesis in text ", textobj["id"])
+            print("[\n", text, "\n]")
+    return text
+
+def removeQuotes(text, textobj):
+    leftQuoteCount = text.count("(")
+    if (stripParanthesis and leftParantCount > 0):
+        if (leftParantCount == text.count(")")):
+            pattern = r'\([^()]*\)' 
+            while re.search(pattern, text):
+                text = re.sub(pattern, '', text) # remove everything everything between paranthesis
+        else:
+            print("Note: found unclosed paranthesis in text ", textobj["id"])
+            print("[\n", text, "\n]")
+    return text
+
 
 # Regex pattern. 11 segments of data seperated by space and start/ending with < and >
 metadata_pattern = re.compile(r"<(\w+)\s+(\w+)\s+(\w+)\s+(\w+)\s+(\w)\s+(\w)\s+(\w+)\s+(\w+)\s+(\w)\s+(\w)\s+(\w)>")
@@ -65,15 +90,7 @@ def parse_file(filePath, writeDebugFile):
             if (textIndx > -1):
                 currentText = output[textIndx]
 
-                leftParantCount = paragraph.text.count("(")
-                if (stripParanthesis and leftParantCount > 0):
-                    if (leftParantCount == paragraph.text.count(")")):
-                        pattern = r'\([^()]*\)' 
-                        while re.search(pattern, paragraph.text):
-                            paragraph.text = re.sub(pattern, '', paragraph.text) # remove everything everything between paranthesis
-                    else:
-                        print("Note: found unclosed paranthesis in text ", output[textIndx]["id"])
-                        print("[\n", paragraph.text, "\n]")
+                paragraph.text = removeParanthesis(paragraph.text, output[textIndx])
 
                 currentText["text"] += paragraph.text
 

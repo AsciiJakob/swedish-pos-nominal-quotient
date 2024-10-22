@@ -1,3 +1,19 @@
+def remove_words_in_quote(tags):
+    output = []
+    inQuote = False
+    for i, taggedSentence in enumerate(tags):
+        outputSentence = [] 
+        for token in taggedSentence:
+            if (token["word"] == '"'):
+                inQuote = not inQuote
+                print('ignoring: "')
+                continue
+            if (not inQuote):
+                outputSentence.append(token)
+            else:
+                print("ignoring: ", token["word"])
+        inQuote = False
+        output.append(outputSentence)
 
 
 
@@ -11,7 +27,7 @@ def nominal_quotient(posTags):
     simpleNouns = 0
     simpleVerbs = 0
     
-    for taggedSentence in posTags:
+    for taggedSentence in remove_words_in_quote(posTags):
         for word in taggedSentence:
             word = word["entity_group"]
             if (word in numeratorTags):
