@@ -18,17 +18,27 @@ def removeParanthesis(text, textobj):
             print("[\n", text, "\n]")
     return text
 
-def removeQuotes(text, textobj):
-    leftQuoteCount = text.count("(")
-    if (stripParanthesis and leftParantCount > 0):
-        if (leftParantCount == text.count(")")):
-            pattern = r'\([^()]*\)' 
-            while re.search(pattern, text):
-                text = re.sub(pattern, '', text) # remove everything everything between paranthesis
-        else:
-            print("Note: found unclosed paranthesis in text ", textobj["id"])
-            print("[\n", text, "\n]")
-    return text
+def checkUnclosedQuote(text):
+    if (text.count('"') % 2 != 0):
+        print("Found unclosed quote in:", text)
+        # exit(1)
+
+def checkUnclosedParanthesis(text):
+    if (text.count("(") != text.count(")")):
+        print("Found unclosed paranthesis in:", text)
+        # exit(1)
+        
+# def removeQuotes(text, textobj):
+#     leftQuoteCount = text.count("(")
+#     if (stripParanthesis and leftParantCount > 0):
+#         if (leftParantCount == text.count(")")):
+#             pattern = r'\([^()]*\)' 
+#             while re.search(pattern, text):
+#                 text = re.sub(pattern, '', text) # remove everything everything between paranthesis
+#         else:
+#             print("Note: found unclosed paranthesis in text ", textobj["id"])
+#             print("[\n", text, "\n]")
+#     return text
 
 
 # Regex pattern. 11 segments of data seperated by space and start/ending with < and >
@@ -90,7 +100,10 @@ def parse_file(filePath, writeDebugFile):
             if (textIndx > -1):
                 currentText = output[textIndx]
 
-                paragraph.text = removeParanthesis(paragraph.text, output[textIndx])
+                checkUnclosedQuote()
+                checkUnclosedParanthesis()
+
+                # paragraph.text = removeParanthesis(paragraph.text, output[textIndx])
 
                 currentText["text"] += paragraph.text
 
