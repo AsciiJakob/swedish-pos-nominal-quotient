@@ -3,32 +3,18 @@ from docx import Document
 import json
 from os import listdir
 from os.path import isfile, join
-stripParanthesis = False 
 
-# remove everything within paranthesis
-def removeParanthesis(text, textobj):
-    leftParantCount = text.count("(")
-    if (stripParanthesis and leftParantCount > 0):
-        if (leftParantCount == text.count(")")):
-            pattern = r'\([^()]*\)' 
-            while re.search(pattern, text):
-                text = re.sub(pattern, '', text) # remove everything everything between paranthesis
-        else:
-            print("Note: found unclosed paranthesis in text ", textobj["id"])
+def checkUnclosedQuotes(text, textobj):
+    leftQuoteCount = text.count('"')
+    if (leftQuoteCount % 2 != 0):
+            print("Note: found unclosed quote in text ", textobj["id"])
             print("[\n", text, "\n]")
-    return text
 
-def removeQuotes(text, textobj):
+def checkUnclosedParenthesis(text, textobj):
     leftQuoteCount = text.count("(")
-    if (stripParanthesis and leftParantCount > 0):
-        if (leftParantCount == text.count(")")):
-            pattern = r'\([^()]*\)' 
-            while re.search(pattern, text):
-                text = re.sub(pattern, '', text) # remove everything everything between paranthesis
-        else:
+    if (leftQuoteCount != text.count(")")):
             print("Note: found unclosed paranthesis in text ", textobj["id"])
             print("[\n", text, "\n]")
-    return text
 
 
 # Regex pattern. 11 segments of data seperated by space and start/ending with < and >
@@ -65,7 +51,11 @@ def extract_metadata(metadata_line):
         return metadata
 
 def parse_file(filePath, writeDebugFile):
-    document = Document(filePath)
+    try:
+        document = Document(filePath)
+    except:
+        print("failed to parse file path:", filePath)
+        exit(1)
 
     textIndx = -1 # start at -1 so that it becomes 0 for the first actual text after it gets incremented for the first metadata
     output = []
@@ -90,7 +80,9 @@ def parse_file(filePath, writeDebugFile):
             if (textIndx > -1):
                 currentText = output[textIndx]
 
-                paragraph.text = removeParanthesis(paragraph.text, output[textIndx])
+                # paragraph.text = removeParanthesis(paragraph.text, output[textIndx])
+                checkUnclosedQuotes(paragraph.text, output[textIndx])
+                checkUnclosedParenthesis(paragraph.text, output[textIndx])
 
                 currentText["text"] += paragraph.text
 
