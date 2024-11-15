@@ -4,17 +4,26 @@ import json
 from os import listdir
 from os.path import isfile, join
 
-def checkUnclosedQuotes(text, textobj):
-    leftQuoteCount = text.count('"')
-    if (leftQuoteCount % 2 != 0):
-            print("Note: found unclosed quote in text ", textobj["id"])
-            print("[\n", text, "\n]")
+# def checkUnclosedQuotes(text, textobj):
+#     leftQuoteCount = text.count('"')
+#     if (leftQuoteCount % 2 != 0):
+#             print("Note: found unclosed quote in text ", textobj["id"])
+#             print("[\n", text, "\n]")
+def checkUnclosedQuote(text):
+    if (text.count('"') % 2 != 0):
+        print("\nFound unclosed quote in:\n", text)
+        # exit(1)
 
-def checkUnclosedParenthesis(text, textobj):
-    leftQuoteCount = text.count("(")
-    if (leftQuoteCount != text.count(")")):
-            print("Note: found unclosed paranthesis in text ", textobj["id"])
-            print("[\n", text, "\n]")
+# def checkUnclosedParenthesis(text, textobj):
+#     leftQuoteCount = text.count("(")
+#     if (leftQuoteCount != text.count(")")):
+#             print("Note: found unclosed paranthesis in text ", textobj["id"])
+#             print("[\n", text, "\n]")
+
+def checkUnclosedParanthesis(text):
+    if (text.count("(") != text.count(")")):
+        print("\nFound unclosed paranthesis in:\n", text)
+        # exit(1)
 
 
 # Regex pattern. 11 segments of data seperated by space and start/ending with < and >
@@ -80,9 +89,8 @@ def parse_file(filePath, writeDebugFile):
             if (textIndx > -1):
                 currentText = output[textIndx]
 
-                # paragraph.text = removeParanthesis(paragraph.text, output[textIndx])
-                checkUnclosedQuotes(paragraph.text, output[textIndx])
-                checkUnclosedParenthesis(paragraph.text, output[textIndx])
+                checkUnclosedQuote(paragraph.text)
+                checkUnclosedParanthesis(paragraph.text)
 
                 currentText["text"] += paragraph.text
 
@@ -96,3 +104,5 @@ def parse_file(filePath, writeDebugFile):
         with open("DEBUG_PARSE.json", "w") as json_file:
             json.dump(output, json_file, indent=4)  # "indent" for pretty-printing
     return output
+
+parse_file("./input/14 A.docx", False)
