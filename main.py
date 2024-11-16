@@ -20,9 +20,10 @@ if (len(sys.argv) > 1):
 
 # Model loop 
 for modelIndx, currentModel in enumerate(selectedModels):
+    print("Attempting to load model", currentModel)
     try:
         POSModule = importlib.import_module("Taggers.pos_"+currentModel)
-        print("Using model "+currentModel)
+        print("Loaded model "+currentModel)
     except:
         print("failed to load POS library called: "+currentModel)
         exit(1)
@@ -52,7 +53,6 @@ for modelIndx, currentModel in enumerate(selectedModels):
                 print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] file: {textsfile["filename"]} [{fileIndx+1}/{len(docxFiles)}] text: [{textI+1}/{len(texts)}] sentence: [{sentenceI + 1}/{len(sentences)}]", end='\r')
                 #wclass = result["entity_group"]
 
-            sentenceAggregation.append(sentenceAggregation)
             nominalQuotient = metrics.nominal_quotient(sentenceAggregation)
             wordCount = metrics.count_words(text["text"])
 
