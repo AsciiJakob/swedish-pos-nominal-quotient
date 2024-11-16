@@ -4,4 +4,5 @@ __pycache__/
 *.rar
 *.pickle
 Visualizer/compiled_computed_tags.js
+Visualizer/computed_compilation.js
 output/sheet.csv
