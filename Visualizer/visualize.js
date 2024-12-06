@@ -185,10 +185,10 @@ function renderSentences() {
     // set metric values
     const currentText = dataFile[currentModel][currentFile].texts[currentTextID];
     document.getElementById("verbNounCount").innerText = "Verb: "+countVerbs+" substantiv: "+countNouns;
-    document.getElementById("fullNominalQuotient").innerText = "Full nominalkvot: " + currentText.full_nominal_quotient;
-    document.getElementById("simpleNominalQuotient").innerText = "Enkel nominalkvot: " + currentText.simple_nominal_quotient;
+    document.getElementById("fullNominalQuotient").innerText = "Full nominalkvot: " + currentText.full_nominal_quotient.toFixed(3);
+    document.getElementById("simpleNominalQuotient").innerText = "Enkel nominalkvot: " + currentText.simple_nominal_quotient.toFixed(3);
     document.getElementById("wordCount").innerText = "Antal ord: " + currentText.word_count;
-    document.getElementById("meanSentenceLength").innerText = "Genomsnittlig meningslängd: " + currentText.mean_sentence_length;
+    document.getElementById("meanSentenceLength").innerText = "Genomsnittlig meningslängd: " + currentText.mean_sentence_length.toFixed(2);
 }
 
 
