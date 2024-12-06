@@ -127,6 +127,7 @@ function renderSentences() {
     const sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences
     let countNouns = 0;
     let countVerbs = 0;
+    let inQuote = false;
 
     textContent.innerText = "";
     for (sentence of sentences) {
@@ -150,6 +151,16 @@ function renderSentences() {
                 countNouns++;
             if (word.entity_group == "VB")
                 countVerbs++;
+
+
+            if (inQuote)
+                wordDiv.classList+=" quoted";
+
+            if (word.word == '"') {
+                if (!inQuote) // also mark the very first quoted token (the quotation mark) as quoted
+                    wordDiv.classList+=" quoted";
+                inQuote = !inQuote;
+            }
 
             const tooltip = document.createElement("span");
             tooltip.classList = "tooltipText";
