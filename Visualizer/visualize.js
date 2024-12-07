@@ -1,3 +1,4 @@
+const ignoreQuotesForMetric = true;
 const textContent = document.getElementById("textContent");
 const numerator = ["NN", "PM", "PP", "PC"];
 const denominator = ["PN", "PS", "VB", "AB"];
@@ -6,6 +7,9 @@ const params = new URLSearchParams(window.location.search);
 let currentModel = params.get("model") || Object.keys(dataFile)[0];
 let currentFile = params.get("fileID") || 0 
 let currentTextID = params.get("textID") || 0;
+if (dataFile[currentModel][currentFile] == undefined)
+    currentFile = 0;
+    currentTextID = 0;
 updateURL();
 setSettingsVisuals();
 
@@ -149,7 +153,7 @@ function renderSentences() {
                 inQuote = !inQuote;
             }
 
-            if (!inQuote) {
+            if (!ignoreQuotesForMetric || !inQuote) {
                 if (numerator.includes(word.entity_group)) {
                     wordDiv.classList+=" numerator"
                 }
