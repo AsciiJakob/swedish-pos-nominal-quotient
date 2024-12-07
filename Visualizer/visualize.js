@@ -140,19 +140,6 @@ function renderSentences() {
             wordDiv.classList = "tooltip";
             wordDiv.innerText = word.word;
 
-            if (numerator.includes(word.entity_group)) {
-                wordDiv.classList+=" numerator"
-            }
-            if (denominator.includes(word.entity_group)) {
-                wordDiv.classList+=" denominator"
-            }
-
-            if (word.entity_group == "NN")
-                countNouns++;
-            if (word.entity_group == "VB")
-                countVerbs++;
-
-
             if (inQuote)
                 wordDiv.classList+=" quoted";
 
@@ -161,6 +148,21 @@ function renderSentences() {
                     wordDiv.classList+=" quoted";
                 inQuote = !inQuote;
             }
+
+            if (!inQuote) {
+                if (numerator.includes(word.entity_group)) {
+                    wordDiv.classList+=" numerator"
+                }
+                if (denominator.includes(word.entity_group)) {
+                    wordDiv.classList+=" denominator"
+                }
+
+                if (word.entity_group == "NN")
+                    countNouns++;
+                if (word.entity_group == "VB")
+                    countVerbs++;
+            }
+
 
             const tooltip = document.createElement("span");
             tooltip.classList = "tooltipText";
