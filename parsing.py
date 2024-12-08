@@ -104,5 +104,3 @@ def parse_file(filePath, writeDebugFile):
         with open("DEBUG_PARSE.json", "w") as json_file:
             json.dump(output, json_file, indent=4)  # "indent" for pretty-printing
     return output
-
-parse_file("./input/14 A.docx", False)

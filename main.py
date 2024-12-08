@@ -53,7 +53,7 @@ for modelIndx, currentModel in enumerate(selectedModels):
                 print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] file: {textsfile["filename"]} [{fileIndx+1}/{len(docxFiles)}] text: [{textI+1}/{len(texts)}] sentence: [{sentenceI + 1}/{len(sentences)}]", end='\r')
                 #wclass = result["entity_group"]
 
-            nominalQuotient = metrics.nominal_quotient(sentenceAggregation)
+            nominalQuotient = metrics.nominal_quotient(sentenceAggregation, False)
             wordCount = metrics.count_words(text["text"])
 
             outputData[fileIndx]["texts"].append({
