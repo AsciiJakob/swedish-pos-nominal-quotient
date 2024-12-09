@@ -47,10 +47,11 @@ for modelIndx, currentModel in enumerate(selectedModels):
         for textI, text in enumerate(texts):
             sentenceAggregation = []
 
+            print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] file: {textsfile["filename"]} [{fileIndx+1}/{len(docxFiles)}] text: [{textI+1}/{len(texts)}]", end='\r')
+
             sentences = segmentize_to_sentences(text["text"])
             for sentenceI, sentence in enumerate(sentences):
                 sentenceAggregation.append(POSModule.pos_tag(sentence))
-                print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] file: {textsfile["filename"]} [{fileIndx+1}/{len(docxFiles)}] text: [{textI+1}/{len(texts)}] sentence: [{sentenceI + 1}/{len(sentences)}]", end='\r')
                 #wclass = result["entity_group"]
 
             nominalQuotient = metrics.nominal_quotient(sentenceAggregation, False)
@@ -63,6 +64,8 @@ for modelIndx, currentModel in enumerate(selectedModels):
                 "word_count": wordCount,
                 "mean_sentence_length": wordCount/len(sentences),
                 "sentences": sentenceAggregation,
+                "quote_char_count": metrics.count_quote_chars(text["text"]),
+                "quote_ratio": metrics.quote_ratio(text["text"]),
             })
 
         print(f"Model {currentModel} finished processing file {textsfile["filename"]}.docx in {round(time.time()-beginTimestamp, 2)} seconds\n")

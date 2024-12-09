@@ -13,10 +13,10 @@ def comma(value):
 def generate_sheet():
     with open("output/sheet.csv", "w", newline="") as csvfile:
         writer = csv.writer(csvfile, delimiter=";")
-        writer.writerow(["Fil","ID","Nominalkvot","Enkel nominalkvot", "Antal ord","Genomsnittlig meningslängd"])
+        writer.writerow(["Fil", "ID", "Nominalkvot", "Enkel nominalkvot", "Antal ord", "Genomsnittlig meningslängd", "Antal citattecken", "Citatkvot"])
 
         try:
-            with open("output/computed_tags_"+model+".json") as f:
+            with open("output/computed_"+model+".json") as f:
                 computedData = json.load(f)
         except:
             print("missing file for model", model)
@@ -31,7 +31,9 @@ def generate_sheet():
                     comma(text_data["full_nominal_quotient"]),
                     comma(text_data["simple_nominal_quotient"]),
                     text_data["word_count"],
-                    comma(text_data["mean_sentence_length"])
+                    comma(text_data["mean_sentence_length"]),
+                    text_data["quote_char_count"],
+                    comma(text_data["quote_ratio"])
                 ])
             writer.writerow([]) # one empty row for new file
 

@@ -10,8 +10,8 @@ def remove_words_in_quote(tags):
                 continue
             elif (not inQuote):
                 outputSentence.append(token)
-            else:
-                print("ignoring: ", token["word"])
+            # else:
+                # print("ignoring: ", token["word"])
         output.append(outputSentence)
     return output
 
@@ -46,9 +46,20 @@ def nominal_quotient(posTags, countQuotedWords):
     
     return {"full": fullNumerator/fullDenominator, "simple": simpleNouns/simpleVerbs}
 
+def quote_ratio(text):
+    charsInQuote = 0
+    for i, s in enumerate(text.split('"')):
+        if (i % 2 != 0): # 0: start of the text, not in quote. 1: first quote. 2: after the quote ends. etc
+            charsInQuote += len(s) 
+
+    return charsInQuote/len(text)
+
 
 def count_words(text):
     return len(text.split())
+
+def count_quote_chars(text):
+    return text.count('"')
 
 def LIX(cWords, cSentences, cLongWords):
     return
