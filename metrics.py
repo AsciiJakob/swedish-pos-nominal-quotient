@@ -15,10 +15,28 @@ def remove_words_in_quote(tags):
         output.append(outputSentence)
     return output
 
+def remove_words_in_parenthesis(tags):
+    output = []
+    parenthesisDepth = 0
+    for i, taggedSentence in enumerate(tags):
+        outputSentence = [] 
+        for token in taggedSentence:
+            if (token["word"] == '('):
+                parenthesisDepth += 1
+                continue
+            elif (token["word"] == ')'):
+                parenthesisDepth -= 1
+                outputSentence.append(token)
+            elif (parenthesisDepth == 0):
+                outputSentence.append(token)
+            else:
+                print("ignoring: ", token["word"])
+        output.append(outputSentence)
+    return output
 
 
 # https://sv.wikipedia.org/wiki/Nominalkvot
-def nominal_quotient(posTags, countQuotedWords):
+def nominal_quotient(posTags, countQuotedWords, countParenthesisWords):
     # for real nominal quotient
     numeratorTags = ["NN", "PM", "PP", "PC"]
     denominatorTags = ["PN", "PS", "VB", "AB"]
@@ -31,6 +49,8 @@ def nominal_quotient(posTags, countQuotedWords):
 
     if (not countQuotedWords):
         posTags = remove_words_in_quote(posTags)
+    if (not countParenthesisWords):
+        posTags = remove_words_in_parenthesis(posTags)
 
     for taggedSentence in posTags:
         for word in taggedSentence:

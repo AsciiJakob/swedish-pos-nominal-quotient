@@ -54,7 +54,7 @@ for modelIndx, currentModel in enumerate(selectedModels):
                 sentenceAggregation.append(POSModule.pos_tag(sentence))
                 #wclass = result["entity_group"]
 
-            nominalQuotient = metrics.nominal_quotient(sentenceAggregation, False)
+            nominalQuotient = metrics.nominal_quotient(sentenceAggregation, False, False)
             wordCount = metrics.count_words(text["text"])
 
             outputData[fileIndx]["texts"].append({
@@ -73,6 +73,7 @@ for modelIndx, currentModel in enumerate(selectedModels):
     with open("output/computed_"+currentModel+".json", "w") as json_file:
         json.dump(outputData, json_file, indent=4)  # "indent" for pretty-printing
 
+# we can't load .json from web javascript since we're just opening a file without running a webserver, hence we're exporting the json data to a js file.
 with open("Visualizer/computed_compilation.js", "w") as jsFile:
     jsFile.write("const dataFile = {};\n")
     for i, model in enumerate(availableModels):

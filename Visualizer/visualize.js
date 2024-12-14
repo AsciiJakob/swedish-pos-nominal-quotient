@@ -132,6 +132,7 @@ function renderSentences() {
     let countNouns = 0;
     let countVerbs = 0;
     let inQuote = false;
+    let parenthesisDepth = 0;
 
     textContent.innerText = "";
     for (sentence of sentences) {
@@ -144,14 +145,21 @@ function renderSentences() {
             wordDiv.classList = "tooltip";
             wordDiv.innerText = word.word;
 
-            if (inQuote)
-                wordDiv.classList+=" quoted";
+            if (inQuote || parenthesisDepth != 0)
+                wordDiv.classList+=" ignored";
 
             if (word.word == '"') {
                 if (!inQuote) // also mark the very first quoted token (the quotation mark) as quoted
-                    wordDiv.classList+=" quoted";
+                    wordDiv.classList+=" ignored";
                 inQuote = !inQuote;
+            } else if (word.word == '(') {
+                if (parenthesisDepth == 0)
+                    wordDiv.classList+=" ignored"
+                parenthesisDepth += 1;
+            } else if (word.word == ')') {
+                parenthesisDepth -= 1;
             }
+
 
             if (!ignoreQuotesForMetric || !inQuote) {
                 if (numerator.includes(word.entity_group)) {
@@ -195,6 +203,8 @@ function renderSentences() {
     document.getElementById("simpleNominalQuotient").innerText = "Enkel nominalkvot: " + currentText.simple_nominal_quotient.toFixed(3);
     document.getElementById("wordCount").innerText = "Antal ord: " + currentText.word_count;
     document.getElementById("meanSentenceLength").innerText = "Genomsnittlig meningslängd: " + currentText.mean_sentence_length.toFixed(2);
+    document.getElementById("quoteCharCount").innerText = "Antal citattecken: " + currentText.quote_char_count;
+    document.getElementById("quoteRatio").innerText = "Andel ord inom citat: " + (currentText.quote_ratio*10).toFixed(2) + "%";
 }
 
 
