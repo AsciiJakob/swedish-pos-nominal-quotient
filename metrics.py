@@ -29,8 +29,8 @@ def remove_words_in_parenthesis(tags):
                 outputSentence.append(token)
             elif (parenthesisDepth == 0):
                 outputSentence.append(token)
-            else:
-                print("ignoring: ", token["word"])
+            # else:
+            #     print("ignoring: ", token["word"])
         output.append(outputSentence)
     return output
 
