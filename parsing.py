@@ -12,7 +12,7 @@ from os.path import isfile, join
 def checkUnclosedQuote(text):
     if (text.count('"') % 2 != 0):
         print("\nFound unclosed quote in:\n", text)
-        # exit(1)
+        exit(1)
 
 # def checkUnclosedParenthesis(text, textobj):
 #     leftQuoteCount = text.count("(")
@@ -23,7 +23,7 @@ def checkUnclosedQuote(text):
 def checkUnclosedParanthesis(text):
     if (text.count("(") != text.count(")")):
         print("\nFound unclosed paranthesis in:\n", text)
-        # exit(1)
+        exit(1)
 
 
 # Regex pattern. 11 segments of data seperated by space and start/ending with < and >
