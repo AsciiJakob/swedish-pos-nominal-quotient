@@ -34,6 +34,31 @@ def remove_words_in_parenthesis(tags):
         output.append(outputSentence)
     return output
 
+def remove_words_in_italics(tags):
+    output = []
+    italicsdepth = 0
+    for i, taggedSentence in enumerate(tags):
+        outputSentence = [] 
+        for i, token in enumerate(taggedSentence):
+            if (token["word"] == '<'):
+                print("next thing:" + taggedSentence[i+1]["word"])
+                if (taggedSentence[i+1]["word"] == '\\'):
+                    print("end thing")
+
+            if (token["word"] == '<' and taggedSentence[i+1]["word"] == "italics" and taggedSentence[i+2]["word"] == '>'):
+                print("depth!")
+                italicsdepth += 1
+                continue
+            elif (token["word"] == '<' and taggedSentence[i+1]["word"] == "\\" and taggedSentence[i+2]["word"] == "italics" and taggedSentence[i+3]["word"] == '>'):
+                print("not depth!")
+                italicsdepth -= 1
+                outputSentence.append(token)
+            elif (italicsdepth == 0):
+                outputSentence.append(token)
+            else:
+                print("ignoring: ", token["word"])
+        output.append(outputSentence)
+    return output
 
 # https://sv.wikipedia.org/wiki/Nominalkvot
 def nominal_quotient(posTags, countQuotedWords, countParenthesisWords):
@@ -51,6 +76,8 @@ def nominal_quotient(posTags, countQuotedWords, countParenthesisWords):
         posTags = remove_words_in_quote(posTags)
     if (not countParenthesisWords):
         posTags = remove_words_in_parenthesis(posTags)
+    # if (True):
+    #     posTags = remove_words_in_italics(posTags)
 
     for taggedSentence in posTags:
         for word in taggedSentence:

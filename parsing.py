@@ -92,6 +92,13 @@ def parse_file(filePath, writeDebugFile):
                 checkUnclosedQuote(paragraph.text)
                 checkUnclosedParanthesis(paragraph.text)
 
+                for run in paragraph.runs:
+                    # print(run.italic)
+                    if (run.italic):
+                        run.text = "<italics>"+run.text+"<\italics>"
+                        # print(run.text)
+
+                # print(paragraph.text)
                 currentText["text"] += paragraph.text
 
                 currentText["text"] += "\n"
@@ -104,3 +111,5 @@ def parse_file(filePath, writeDebugFile):
         with open("DEBUG_PARSE.json", "w") as json_file:
             json.dump(output, json_file, indent=4)  # "indent" for pretty-printing
     return output
+
+# parse_file("./input/test.docx", False)
