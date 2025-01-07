@@ -1,3 +1,9 @@
+def check_tokens(taggedSentence, base, *args):
+    for i, _ in enumerate(args):
+        if taggedSentence[base+i]["word"] != args[i]:
+            return False
+    return True
+
 def remove_words_in_quote(tags):
     # return tags
     output = []
@@ -7,7 +13,6 @@ def remove_words_in_quote(tags):
         for token in taggedSentence:
             if (token["word"] == '"'):
                 inQuote = not inQuote
-                continue
             elif (not inQuote):
                 outputSentence.append(token)
             # else:
@@ -23,36 +28,33 @@ def remove_words_in_parenthesis(tags):
         for token in taggedSentence:
             if (token["word"] == '('):
                 parenthesisDepth += 1
-                continue
             elif (token["word"] == ')'):
                 parenthesisDepth -= 1
-                outputSentence.append(token)
             elif (parenthesisDepth == 0):
                 outputSentence.append(token)
-            # else:
-            #     print("ignoring: ", token["word"])
+            else:
+                print("ignoring: ", token["word"])
+            assert parenthesisDepth >= 0, "Fatal error: parenthesisdepth should never be < 0"
         output.append(outputSentence)
     return output
 
 def remove_words_in_italics(tags):
     output = []
     italicsdepth = 0
+    skipTokens = 0
     for i, taggedSentence in enumerate(tags):
         outputSentence = [] 
         for i, token in enumerate(taggedSentence):
-            if (token["word"] == '<'):
-                print("next thing:" + taggedSentence[i+1]["word"])
-                if (taggedSentence[i+1]["word"] == '\\'):
-                    print("end thing")
-
-            if (token["word"] == '<' and taggedSentence[i+1]["word"] == "italics" and taggedSentence[i+2]["word"] == '>'):
-                print("depth!")
-                italicsdepth += 1
+            if (skipTokens > 0):
+                skipTokens = skipTokens-1
+                print("skipping extra token: ", token["word"])
                 continue
-            elif (token["word"] == '<' and taggedSentence[i+1]["word"] == "\\" and taggedSentence[i+2]["word"] == "italics" and taggedSentence[i+3]["word"] == '>'):
-                print("not depth!")
+
+            if (check_tokens(taggedSentence, i, '<', "italics", '>')):
+                italicsdepth += 1
+            elif (check_tokens(taggedSentence, i, '<', '\\', "italics", '>')):
                 italicsdepth -= 1
-                outputSentence.append(token)
+                skipTokens = 3
             elif (italicsdepth == 0):
                 outputSentence.append(token)
             else:
@@ -76,8 +78,8 @@ def nominal_quotient(posTags, countQuotedWords, countParenthesisWords):
         posTags = remove_words_in_quote(posTags)
     if (not countParenthesisWords):
         posTags = remove_words_in_parenthesis(posTags)
-    # if (True):
-    #     posTags = remove_words_in_italics(posTags)
+    if (True):
+        posTags = remove_words_in_italics(posTags)
 
     for taggedSentence in posTags:
         for word in taggedSentence:

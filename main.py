@@ -52,7 +52,6 @@ for modelIndx, currentModel in enumerate(selectedModels):
             sentences = segmentize_to_sentences(text["text"])
             for sentenceI, sentence in enumerate(sentences):
                 sentenceAggregation.append(POSModule.pos_tag(sentence))
-                #wclass = result["entity_group"]
 
             nominalQuotient = metrics.nominal_quotient(sentenceAggregation, False, False)
             wordCount = metrics.count_words(text["text"])

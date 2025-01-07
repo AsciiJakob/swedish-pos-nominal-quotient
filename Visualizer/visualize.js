@@ -127,11 +127,21 @@ function setSettingsVisuals() {
     document.getElementById("textSelector").value = currentTextID;
 }
 
+
+function checkTokens(sentence, base, ...args) {
+    for (let i=0; i < args.length; i++) {
+        if (sentence[base+i]["word"] != args[i])
+            return false
+    }
+    return true
+}
+
 function renderSentences() {
-    const sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences
+    const sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences;
     let countNouns = 0;
     let countVerbs = 0;
     let inQuote = false;
+    let inItalics = false;
     let parenthesisDepth = 0;
 
     textContent.innerText = "";
@@ -145,6 +155,7 @@ function renderSentences() {
             wordDiv.classList = "tooltip";
             wordDiv.innerText = word.word;
 
+            
             if (inQuote || parenthesisDepth != 0)
                 wordDiv.classList+=" ignored";
 
@@ -154,11 +165,24 @@ function renderSentences() {
                 inQuote = !inQuote;
             } else if (word.word == '(') {
                 if (parenthesisDepth == 0)
-                    wordDiv.classList+=" ignored"
+                    wordDiv.classList+=" ignored";
                 parenthesisDepth += 1;
             } else if (word.word == ')') {
                 parenthesisDepth -= 1;
+            } else if (checkTokens(sentence, i, '<', '\\', "italics", '>')) {
+                inItalics = false;
+                wordDiv.remove();
+                i += 3; // skip this and the next 3 tokens
+                continue;
+            } else if (checkTokens(sentence, i, '<', "italics", '>')) {
+                inItalics = true;
+                wordDiv.remove();
+                i += 2; // skip this and the next 2 tokens
+                continue;
             }
+
+            if (inItalics)
+                wordDiv.classList+= " italics ignored"
 
 
             if (!ignoreQuotesForMetric || !inQuote) {
