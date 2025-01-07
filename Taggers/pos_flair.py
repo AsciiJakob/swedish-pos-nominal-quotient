@@ -17,13 +17,15 @@ def pos_tag(sentence):
 
     output = []
     for token in sentence:
-        # print("word: ", token.text)
         word_class = token.tag.split('.')[0]
-        # print("tag: ", word_class)
-        output.append({"entity_group": word_class, "word": token.text})
+        word = token.text
 
-    # print("labels:", sentence.get_labels("pos"))
-    # for word in sentence:
-    #     print("Word: ", word.tag, "POS value: ", word.get_label("pos").value)
-    # return ["entity_group": sentence.tag]
+        # Flair groups things like "))" or "<\" into one token instead of two, which is not consistent with KB-bert and will break certain things.
+        # This will split it up into two tokens like it should be.
+        if (token.text == "))" or token.text == "<\\"): 
+            output.append({"entity_group": word_class, "word": token.text[0]})
+            word = token.text[1]
+
+        output.append({"entity_group": word_class, "word": word})
+
     return output 
