@@ -1,5 +1,6 @@
 from segmentation import segmentize_to_sentences
 from parsing import parse_file, get_folder_docx_files
+from sheet import generate_sheets
 import metrics as metrics
 # from pos_kb_bert import pos_tag
 # from pos_flair import pos_tag
@@ -36,7 +37,7 @@ for modelIndx, currentModel in enumerate(selectedModels):
     
 
     #loop through files
-    # loop through texts thing  
+    # loop through texts thing
     docxFiles = get_folder_docx_files("input/")
     print("docxfiles: ", docxFiles)
 
@@ -88,3 +89,5 @@ with open("Visualizer/computed_compilation.js", "w") as jsFile:
         json.dump(modelComputedTags, jsFile)
         jsFile.write(";\n")
 
+# finally, generate the csv files containing the texts and their metrics
+generate_sheets()
