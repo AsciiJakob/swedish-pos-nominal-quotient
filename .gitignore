@@ -6,4 +6,4 @@ __pycache__/
 *.csv
 Visualizer/compiled_computed_tags.js
 Visualizer/computed_compilation.js
-output/sheet.csv
+output/*
