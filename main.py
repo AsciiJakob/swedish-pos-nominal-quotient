@@ -20,7 +20,6 @@ if (len(sys.argv) > 1):
     if (selectedModels[0] == "none"):
         skipProcessing = True
 
-# Model loop 
 for modelIndx, currentModel in enumerate(selectedModels):
     print("Attempting to load model", currentModel)
     try:
@@ -32,13 +31,6 @@ for modelIndx, currentModel in enumerate(selectedModels):
     beginTimestamp = time.time()
 
 
-    # # load text 
-    # with open("14 A.json") as f:
-    #     textsFile = json.load(f)
-    
-
-    #loop through files
-    # loop through texts thing
     docxFiles = get_folder_docx_files("input/")
     print("docxfiles: ", docxFiles)
 
@@ -57,6 +49,7 @@ for modelIndx, currentModel in enumerate(selectedModels):
 
             # Apply filtering to remove words in quotes, parenthesis or italics.
             # Also removes <italics> tags from the text so they don't distrub metrics, we only need that information if we're filtering italics out.
+            print(text["id"])
             filtered_sentences = filter_sentences(sentenceAggregation, True, True, True)
 
             nominalQuotient = metrics.nominal_quotient(filtered_sentences)

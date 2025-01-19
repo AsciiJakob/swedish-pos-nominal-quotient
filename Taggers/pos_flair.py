@@ -21,11 +21,19 @@ def pos_tag(sentence):
         word = token.text
 
         # Flair groups things like "))" or "<\" into one token instead of two, which is not consistent with KB-bert and will break certain things.
-        # This will split it up into two tokens like it should be.
-        if (token.text == "))" or token.text == "<\\"): 
-            output.append({"entity_group": word_class, "word": token.text[0]})
-            word = token.text[1]
+        # This will split it up into multiple tokens like it should be.
+        # common_culprits = ["))", "((", "<\\", ">(", ")<", "),<", "\")", ")\"", "\"(", "(\"", "(<", "<(", ").<\\"]
+        
+        special_chars = ['"', '(', ')', '<', '>', '[', ']']
 
-        output.append({"entity_group": word_class, "word": word})
+        if (len(token.text) > 1 and any(char in token.text for char in special_chars)):
+            chars = list(token.text)
+            for char in chars:
+                assert not char.isalpha(), "Fatal error: unsure how to split combined tokens with alpha characters"
+
+                # word_class won't be exactly right, but only the classes of words are cared about in this project
+                output.append({"entity_group": word_class, "word": char})
+        else:
+            output.append({"entity_group": word_class, "word": word})
 
     return output 

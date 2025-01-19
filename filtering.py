@@ -32,10 +32,12 @@ def remove_words_in_parenthesis(tags):
                 parenthesisDepth -= 1
             elif (parenthesisDepth == 0):
                 outputSentence.append(token)
-            else:
-                print("ignoring: ", token["word"])
+            # else:
+            #     print("ignoring: ", token["word"])
+            # print(token["word"]+" ")
             assert parenthesisDepth >= 0, "Fatal error: parenthesisdepth should never be < 0"
         output.append(outputSentence)
+    assert parenthesisDepth == 0, "Fatal error: text ended without parenthesis being closed off"
     return output
 
 def remove_words_in_italics(tags):
@@ -47,7 +49,7 @@ def remove_words_in_italics(tags):
         for i, token in enumerate(taggedSentence):
             if (skipTokens > 0):
                 skipTokens = skipTokens-1
-                print("skipping extra token: ", token["word"])
+                # print("skipping extra token: ", token["word"])
                 continue
 
             if (check_tokens(taggedSentence, i, '<', "italics", '>')):
@@ -57,8 +59,8 @@ def remove_words_in_italics(tags):
                 skipTokens = 3
             elif (italicsdepth == 0):
                 outputSentence.append(token)
-            else:
-                print("ignoring: ", token["word"])
+            # else:
+            #     print("ignoring: ", token["word"])
         output.append(outputSentence)
     return output
 
@@ -70,7 +72,6 @@ def remove_italics_markings(tags):
         for i, token in enumerate(taggedSentence):
             if (skipTokens > 0):
                 skipTokens = skipTokens-1
-                print("skipping extra token: ", token["word"])
                 continue
 
             if (check_tokens(taggedSentence, i, '<', "italics", '>')):
