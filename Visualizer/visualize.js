@@ -1,4 +1,3 @@
-const ignoreQuotesForMetric = true;
 const textContent = document.getElementById("textContent");
 const numerator = ["NN", "PM", "PP", "PC"];
 const denominator = ["PN", "PS", "VB", "AB"];
@@ -7,18 +6,28 @@ const params = new URLSearchParams(window.location.search);
 let currentModel = params.get("model") || Object.keys(dataFile)[0];
 let currentFile = params.get("fileID") || 0 
 let currentTextID = params.get("textID") || 0;
-if (dataFile[currentModel][currentFile] == undefined)
+if (dataFile[currentModel][currentFile] == undefined) {
     currentFile = 0;
     currentTextID = 0;
+}
+let markIgnored = params.get("markIgnored");
+console.log(markIgnored)
+if (markIgnored == undefined) {
+    markIgnored = true // default value
+} else {
+    markIgnored = markIgnored === "true";
+}
+let loadPythonFiltering = params.get("pythonFiltering") === "true";
+if (loadPythonFiltering == undefined)
+    loadPythonFiltering = false
 updateURL();
 setSettingsVisuals();
-
 renderSentences();
 
 // store application states in url since refreshing is great but losing your state isn't.
 function updateURL() {
     // const newUrl = `?model=${encodeURIComponent(currentModel)}&textID=${encodeURIComponent(currentTextID)}`;
-    const newUrl = `?model=${encodeURIComponent(currentModel)}&fileID=${encodeURIComponent(currentFile)}&textID=${encodeURIComponent(currentTextID)}`;
+    const newUrl = `?model=${encodeURIComponent(currentModel)}&fileID=${encodeURIComponent(currentFile)}&textID=${encodeURIComponent(currentTextID)}&markIgnored=${encodeURIComponent(markIgnored)}&pythonFiltering=${encodeURIComponent(loadPythonFiltering)}`;
     window.history.pushState(null, '', newUrl);
 }
 
@@ -38,34 +47,29 @@ function handleSetting(settingElement) {
                 currentTextID = 0;
         }
         currentModel = settingElement.id;
-        updateURL();
-        setSettingsVisuals(); // update the text options to match current model (in case they have anaylized different corpuses)
-        renderSentences();
-    }
-
-
-    if (settingElement.name == "fileID") {
+    } else if (settingElement.name == "fileID") {
         if (dataFile[currentModel].length-1 < settingElement.value) {
             alert("Något gick snett");
             return;
         }
         currentFile = settingElement.value;
-        updateURL();
-        setSettingsVisuals();
-        renderSentences();
-    };
 
-
-    if (settingElement.name == "textID") {
+    } else if (settingElement.name == "textID") {
         if (dataFile[currentModel][currentFile].texts.length-1 < settingElement.value) {
             alert("Den här texten har inte analyserats med den modell som är vald.");
             return;
         }
         currentTextID = settingElement.value;
-        updateURL();
-        setSettingsVisuals();
-        renderSentences();
+
+    } else if (settingElement.name == "markIgnored") {
+        markIgnored = settingElement.checked;
+
+    } else if (settingElement.name == "loadPythonFiltering") {
+        loadPythonFiltering = settingElement.checked;
     }
+    updateURL();
+    setSettingsVisuals();
+    renderSentences();
 }
 
 function setSettingsVisuals() {
@@ -125,6 +129,10 @@ function setSettingsVisuals() {
     document.getElementById(currentModel).checked = true;
 
     document.getElementById("textSelector").value = currentTextID;
+
+    document.getElementById("markIgnored").checked = markIgnored;
+    document.getElementById("loadPythonFiltering").checked = loadPythonFiltering;
+    document.getElementById("markIgnored").disabled = loadPythonFiltering;
 }
 
 
@@ -137,7 +145,12 @@ function checkTokens(sentence, base, ...args) {
 }
 
 function renderSentences() {
-    const sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences;
+    let sentences = []
+    if (loadPythonFiltering) {
+        sentences = dataFile[currentModel][currentFile].texts[currentTextID].filtered_sentences;
+    } else {
+        sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences;
+    }
     let countNouns = 0;
     let countVerbs = 0;
     let inQuote = false;
@@ -156,36 +169,37 @@ function renderSentences() {
             wordDiv.innerText = word.word;
 
             
-            if (inQuote || parenthesisDepth != 0)
-                wordDiv.classList+=" ignored";
+            if (markIgnored) {
+                if (inQuote || parenthesisDepth != 0)
+                    wordDiv.classList+=" ignored";
 
-            if (word.word == '"') {
-                if (!inQuote) // also mark the very first quoted token (the quotation mark) as quoted
-                    wordDiv.classList+=" ignored";
-                inQuote = !inQuote;
-            } else if (word.word == '(') {
-                if (parenthesisDepth == 0)
-                    wordDiv.classList+=" ignored";
-                parenthesisDepth += 1;
-            } else if (word.word == ')') {
-                parenthesisDepth -= 1;
-            } else if (checkTokens(sentence, i, '<', '\\', "italics", '>')) {
-                inItalics = false;
-                wordDiv.remove();
-                i += 3; // skip this and the next 3 tokens
-                continue;
-            } else if (checkTokens(sentence, i, '<', "italics", '>')) {
-                inItalics = true;
-                wordDiv.remove();
-                i += 2; // skip this and the next 2 tokens
-                continue;
+                if (word.word == '"') {
+                    if (!inQuote) // also mark the very first quoted token (the quotation mark) as quoted
+                        wordDiv.classList+=" ignored";
+                    inQuote = !inQuote;
+                } else if (word.word == '(') {
+                    if (parenthesisDepth == 0)
+                        wordDiv.classList+=" ignored";
+                    parenthesisDepth += 1;
+                } else if (word.word == ')') {
+                    parenthesisDepth -= 1;
+                } else if (checkTokens(sentence, i, '<', '\\', "italics", '>')) {
+                    inItalics = false;
+                    wordDiv.remove();
+                    i += 3; // skip this and the next 3 tokens
+                    continue;
+                } else if (checkTokens(sentence, i, '<', "italics", '>')) {
+                    inItalics = true;
+                    wordDiv.remove();
+                    i += 2; // skip this and the next 2 tokens
+                    continue;
+                }
+
+                if (inItalics)
+                    wordDiv.classList+= " italics ignored"
             }
 
-            if (inItalics)
-                wordDiv.classList+= " italics ignored"
-
-
-            if (!ignoreQuotesForMetric || !inQuote) {
+            if (markIgnored | (!inQuote && !inItalics && parenthesisDepth == 0)) {
                 if (numerator.includes(word.entity_group)) {
                     wordDiv.classList+=" numerator"
                 }
@@ -198,7 +212,6 @@ function renderSentences() {
                 if (word.entity_group == "VB")
                     countVerbs++;
             }
-
 
             const tooltip = document.createElement("span");
             tooltip.classList = "tooltipText";

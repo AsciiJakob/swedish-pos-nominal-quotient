@@ -4,6 +4,9 @@
         <script src="computed_compilation.js"></script>
     </head>
     <body>
+        <p id="informationText">
+            Visualiseringsverktyg för resultatet av ordklasstaggningen. Grön text är en del av nominalkvotens nämnare, orange text är en del av täljaren och grå text ignoreras (ifall huvudprogrammet körs med ignorering av citat/parenteser/kursiverad text). 
+        </p>
         <div id="sideData">
             <h3 id="fullNominalQuotient">laddar</h3>
             <h3 id="simpleNominalQuotient">laddar</h3>
@@ -13,6 +16,13 @@
             <h3 id="quoteCharCount">laddar</h3>
             <h3 id="quoteRatio">laddar</h3>
             <div id="settingsContainer">
+                <input type="checkbox" id="markIgnored" name="markIgnored">
+                <label for="markIgnored">Markera text som nominalkvoten ignorerar</label>
+                <br>
+                <input type="checkbox" id="loadPythonFiltering" name="loadPythonFiltering">
+                <label for="loadPythonFiltering">Ladda python-programmets filtrering</label>
+                <br>
+                <br>
                 <fieldset id="modelSelector">
                     <legend>Ordklasstaggningsmodell:</legend>
                     <!-- <input type="radio" name="model" id="flair"> <label for="flair">Flair</label>
@@ -36,6 +46,12 @@
 <style>
 body {
     background-color: #ffe7c8;
+    /* font-family: Arial, Helvetica, sans-serif */
+}
+#informationText {
+    float: left;
+    position: absolute;
+    width: 15%;
 }
 #sideData {
     width: 20%;
