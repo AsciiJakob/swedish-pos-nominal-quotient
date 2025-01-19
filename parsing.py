@@ -83,7 +83,8 @@ def parse_file(filePath, writeDebugFile):
                 "sex": metadata["sex"],
                 "betyg": metadata["betyg"],
                 "format": metadata["format"],
-                "text": ""
+                "text": "",
+                "italicsMarkingTokens": 0
             })
         else:
             if (textIndx > -1):
@@ -96,6 +97,7 @@ def parse_file(filePath, writeDebugFile):
                     # print(run.italic)
                     if (run.italic):
                         run.text = "<italics>"+run.text+"<\italics>"
+                        currentText["italicsMarkingTokens"] += 7
                         # print(run.text)
 
                 # print(paragraph.text)

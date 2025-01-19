@@ -1,6 +1,7 @@
 from segmentation import segmentize_to_sentences
 from parsing import parse_file, get_folder_docx_files
 from sheet import generate_sheets
+from filtering import filter_sentences
 import metrics as metrics
 # from pos_kb_bert import pos_tag
 # from pos_flair import pos_tag
@@ -54,8 +55,12 @@ for modelIndx, currentModel in enumerate(selectedModels):
             for sentenceI, sentence in enumerate(sentences):
                 sentenceAggregation.append(POSModule.pos_tag(sentence))
 
-            nominalQuotient = metrics.nominal_quotient(sentenceAggregation, False, False)
-            wordCount = metrics.count_words(text["text"])
+            # Apply filtering to remove words in quotes, parenthesis or italics.
+            # Also removes <italics> tags from the text so they don't distrub metrics, we only need that information if we're filtering italics out.
+            filtered_sentences = filter_sentences(sentenceAggregation, True, True, True)
+
+            nominalQuotient = metrics.nominal_quotient(filtered_sentences)
+            wordCount = metrics.count_tokens(text["text"])-text["italicsMarkingTokens"]
 
             outputData[fileIndx]["texts"].append({
                 "id": text["id"],
@@ -63,7 +68,8 @@ for modelIndx, currentModel in enumerate(selectedModels):
                 "simple_nominal_quotient": nominalQuotient["simple"],
                 "word_count": wordCount,
                 "mean_sentence_length": wordCount/len(sentences),
-                "sentences": sentenceAggregation,
+                "sentences": sentenceAggregation, # this and filtered_sentences are only used for the visualizing tool so you can remove these if don't care about that and want to save storage i suppose
+                "filtered_sentences": filtered_sentences,
                 "quote_char_count": metrics.count_quote_chars(text["text"]),
                 "quote_ratio": metrics.quote_ratio(text["text"]),
             })

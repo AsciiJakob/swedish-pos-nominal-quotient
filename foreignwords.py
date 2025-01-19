@@ -19,9 +19,11 @@ for file in only_files:
             for file_data in computedData:
                 filename = file_data["filename"]
                 for text in file_data["texts"]:
-                    for sentence in text["sentences"]:
+                    for sentence in text["filtered_sentences"]:
                         for token in sentence:
                             if token["entity_group"] == "UO":
-                                output.append(token["word"])
+                                output.append(f"{token["word"]} [{text["id"]}]\n")
 
-print(output)
+with open(folderPath+"foreign_words.txt", "w", encoding="utf-8") as file:
+    for item in output:
+        file.write(item)

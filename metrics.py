@@ -1,69 +1,5 @@
-def check_tokens(taggedSentence, base, *args):
-    for i, _ in enumerate(args):
-        if taggedSentence[base+i]["word"] != args[i]:
-            return False
-    return True
-
-def remove_words_in_quote(tags):
-    # return tags
-    output = []
-    inQuote = False
-    for i, taggedSentence in enumerate(tags):
-        outputSentence = [] 
-        for token in taggedSentence:
-            if (token["word"] == '"'):
-                inQuote = not inQuote
-            elif (not inQuote):
-                outputSentence.append(token)
-            # else:
-                # print("ignoring: ", token["word"])
-        output.append(outputSentence)
-    return output
-
-def remove_words_in_parenthesis(tags):
-    output = []
-    parenthesisDepth = 0
-    for i, taggedSentence in enumerate(tags):
-        outputSentence = [] 
-        for token in taggedSentence:
-            if (token["word"] == '('):
-                parenthesisDepth += 1
-            elif (token["word"] == ')'):
-                parenthesisDepth -= 1
-            elif (parenthesisDepth == 0):
-                outputSentence.append(token)
-            else:
-                print("ignoring: ", token["word"])
-            assert parenthesisDepth >= 0, "Fatal error: parenthesisdepth should never be < 0"
-        output.append(outputSentence)
-    return output
-
-def remove_words_in_italics(tags):
-    output = []
-    italicsdepth = 0
-    skipTokens = 0
-    for i, taggedSentence in enumerate(tags):
-        outputSentence = [] 
-        for i, token in enumerate(taggedSentence):
-            if (skipTokens > 0):
-                skipTokens = skipTokens-1
-                print("skipping extra token: ", token["word"])
-                continue
-
-            if (check_tokens(taggedSentence, i, '<', "italics", '>')):
-                italicsdepth += 1
-            elif (check_tokens(taggedSentence, i, '<', '\\', "italics", '>')):
-                italicsdepth -= 1
-                skipTokens = 3
-            elif (italicsdepth == 0):
-                outputSentence.append(token)
-            else:
-                print("ignoring: ", token["word"])
-        output.append(outputSentence)
-    return output
-
 # https://sv.wikipedia.org/wiki/Nominalkvot
-def nominal_quotient(posTags, countQuotedWords, countParenthesisWords):
+def nominal_quotient(posTags):
     # for real nominal quotient
     numeratorTags = ["NN", "PM", "PP", "PC"]
     denominatorTags = ["PN", "PS", "VB", "AB"]
@@ -73,13 +9,6 @@ def nominal_quotient(posTags, countQuotedWords, countParenthesisWords):
     # for simple nominal quotient
     simpleNouns = 0
     simpleVerbs = 0
-
-    if (not countQuotedWords):
-        posTags = remove_words_in_quote(posTags)
-    if (not countParenthesisWords):
-        posTags = remove_words_in_parenthesis(posTags)
-    if (True):
-        posTags = remove_words_in_italics(posTags)
 
     for taggedSentence in posTags:
         for word in taggedSentence:
@@ -104,7 +33,7 @@ def quote_ratio(text):
     return charsInQuote/len(text)
 
 
-def count_words(text):
+def count_tokens(text):
     return len(text.split())
 
 def count_quote_chars(text):
