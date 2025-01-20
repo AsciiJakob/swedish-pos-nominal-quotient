@@ -32,6 +32,7 @@ function updateURL() {
 }
 
 // settings-related things
+let lastMarkIgnoredValue = markIgnored
 document.getElementById("settingsContainer").addEventListener("change", mouseEvent => handleSetting(mouseEvent.target));
 function handleSetting(settingElement) {
     if (settingElement.name == "model") {
@@ -66,6 +67,13 @@ function handleSetting(settingElement) {
 
     } else if (settingElement.name == "loadPythonFiltering") {
         loadPythonFiltering = settingElement.checked;
+        if (settingElement.checked) {
+            lastMarkIgnoredValue = markIgnored
+            markIgnored = false;
+        } else {
+            markIgnored = lastMarkIgnoredValue
+        }
+
     }
     updateURL();
     setSettingsVisuals();
@@ -146,10 +154,16 @@ function checkTokens(sentence, base, ...args) {
 
 function renderSentences() {
     let sentences = []
+    let renderText = dataFile[currentModel][currentFile].texts[currentTextID]
+    if (renderText == undefined) {
+        currentFile = 0;
+        currentTextID = 0;
+        renderText = dataFile[currentModel][currentFile].texts[currentTextID];
+    }
     if (loadPythonFiltering) {
-        sentences = dataFile[currentModel][currentFile].texts[currentTextID].filtered_sentences;
+        sentences = renderText.filtered_sentences;
     } else {
-        sentences = dataFile[currentModel][currentFile].texts[currentTextID].sentences;
+        sentences = renderText.sentences;
     }
     let countNouns = 0;
     let countVerbs = 0;

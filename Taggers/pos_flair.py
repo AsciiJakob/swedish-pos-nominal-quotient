@@ -24,7 +24,7 @@ def pos_tag(sentence):
         # This will split it up into multiple tokens like it should be.
         # common_culprits = ["))", "((", "<\\", ">(", ")<", "),<", "\")", ")\"", "\"(", "(\"", "(<", "<(", ").<\\"]
         
-        special_chars = ['"', '(', ')', '<', '>', '[', ']']
+        special_chars = ['"', '(', ')', '<', '>', '[', ']'] # only ones i've found causing issues so far
 
         if (len(token.text) > 1 and any(char in token.text for char in special_chars)):
             chars = list(token.text)

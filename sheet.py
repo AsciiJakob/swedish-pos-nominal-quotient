@@ -41,4 +41,4 @@ def generate_sheets():
                                 comma(text_data["quote_ratio"])
                             ])
                         writer.writerow([]) # we'll have one empty row between each file
-        print("Generated "+str(len(only_files))+" sheets")
+        print("Generated sheets")

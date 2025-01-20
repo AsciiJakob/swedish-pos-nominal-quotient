@@ -64,7 +64,8 @@ for modelIndx, currentModel in enumerate(selectedModels):
                 "sentences": sentenceAggregation, # this and filtered_sentences are only used for the visualizing tool so you can remove these if don't care about that and want to save storage i suppose
                 "filtered_sentences": filtered_sentences,
                 "quote_char_count": metrics.count_quote_chars(text["text"]),
-                "quote_ratio": metrics.quote_ratio(text["text"]),
+                "quote_ratio": metrics.quote_ratio(text["text"])
+                # "LIX": metrics.LIX(),
             })
 
         print(f"Model {currentModel} finished processing file {textsfile["filename"]}.docx in {round(time.time()-beginTimestamp, 2)} seconds\n")
