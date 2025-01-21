@@ -3,91 +3,83 @@ from parsing import parse_file, get_folder_docx_files
 from sheet import generate_sheets
 from filtering import filter_sentences
 import metrics as metrics
-# from pos_kb_bert import pos_tag
-# from pos_flair import pos_tag
 import json
 import sys
 import time
 import importlib
 
-availableModels = ["flair", "kb_bert", "kb_bert_aggregation", "kb_bert_test"]
+available_models = ["flair", "kb_bert", "kb_bert_aggregation", "kb_bert_test"]
 
-selectedModels = ["kb_bert"] # set default model
+selected_model = ["kb_bert"] # set default model
 if (len(sys.argv) > 1):
-    selectedModels = sys.argv[1].split(",")
-    if (selectedModels[0] == "all"):
-        selectedModels = availableModels
-    if (selectedModels[0] == "none"):
-        skipProcessing = True
+    selected_model = sys.argv[1].split(",")
+    if (selected_model[0] == "all"):
+        selected_model = available_models
 
-for modelIndx, currentModel in enumerate(selectedModels):
-    print("Attempting to load model", currentModel)
+for model_index, current_model in enumerate(selected_model):
+    print("Attempting to load model", current_model)
     try:
-        POSModule = importlib.import_module("Taggers.pos_"+currentModel)
-        print("Loaded model "+currentModel)
+        POSModule = importlib.import_module("Taggers.pos_"+current_model)
+        print("Loaded model "+current_model)
     except:
-        print("failed to load POS library called: "+currentModel)
+        print("failed to load POS library called: "+current_model)
         exit(1)
-    beginTimestamp = time.time()
+    timestamp_start = time.time()
 
 
-    docxFiles = get_folder_docx_files("input/")
-    print("docxfiles: ", docxFiles)
+    docx_files = get_folder_docx_files("input/")
+    output = []
+    for file_index, texts_file in enumerate(docx_files):
+        texts = parse_file(texts_file["fullPath"], False)
+        output.append({"filename": texts_file["filename"], "texts": []})
+        for text_index, text in enumerate(texts):
+            print(f"Processing, model: [{model_index+1}/{len(selected_model)}] file: {texts_file["filename"]} [{file_index+1}/{len(docx_files)}] text: [{text_index+1}/{len(texts)}]", end='\r')
 
-    outputData = []
-    for fileIndx, textsfile in enumerate(docxFiles):
-        texts = parse_file(textsfile["fullPath"], False)
-        outputData.append({"filename": textsfile["filename"], "texts": []})
-        for textI, text in enumerate(texts):
-            sentenceAggregation = []
-
-            print(f"Processing, model: [{modelIndx+1}/{len(selectedModels)}] file: {textsfile["filename"]} [{fileIndx+1}/{len(docxFiles)}] text: [{textI+1}/{len(texts)}]", end='\r')
+            sentence_aggregation = []
 
             sentences = segmentize_to_sentences(text["text"])
-            for sentenceI, sentence in enumerate(sentences):
-                sentenceAggregation.append(POSModule.pos_tag(sentence))
+            for sentence in sentences:
+                sentence_aggregation.append(POSModule.pos_tag(sentence))
 
             # Apply filtering to remove words in quotes, parenthesis or italics.
             # Also removes <italics> tags from the text so they don't distrub metrics, we only need that information if we're filtering italics out.
-            print(text["id"])
-            filtered_sentences = filter_sentences(sentenceAggregation, True, True, True)
+            filtered_sentences = filter_sentences(sentence_aggregation, True, True, True)
 
-            nominalQuotient = metrics.nominal_quotient(filtered_sentences)
-            wordCount = metrics.count_tokens(text["text"])-text["italicsMarkingTokens"]
+            nominal_quotient = metrics.nominal_quotient(filtered_sentences)
+            word_count = metrics.count_tokens(text["text"])-text["italics_marking_tokens"]
 
-            outputData[fileIndx]["texts"].append({
+            output[file_index]["texts"].append({
                 "id": text["id"],
-                "full_nominal_quotient": nominalQuotient["full"],
-                "simple_nominal_quotient": nominalQuotient["simple"],
-                "word_count": wordCount,
-                "mean_sentence_length": wordCount/len(sentences),
-                "sentences": sentenceAggregation, # this and filtered_sentences are only used for the visualizing tool so you can remove these if don't care about that and want to save storage i suppose
+                "full_nominal_quotient": nominal_quotient["full"],
+                "simple_nominal_quotient": nominal_quotient["simple"],
+                "word_count": word_count,
+                "mean_sentence_length": word_count/len(sentences),
+                "sentences": sentence_aggregation, # this and filtered_sentences are only used for the visualizing tool so you can remove these if don't care about that and want to save storage i suppose
                 "filtered_sentences": filtered_sentences,
                 "quote_char_count": metrics.count_quote_chars(text["text"]),
                 "quote_ratio": metrics.quote_ratio(text["text"])
                 # "LIX": metrics.LIX(),
             })
 
-        print(f"Model {currentModel} finished processing file {textsfile["filename"]}.docx in {round(time.time()-beginTimestamp, 2)} seconds\n")
+        print(f"Model {current_model} finished processing file {texts_file["filename"]}.docx in {round(time.time()-timestamp_start, 2)} seconds\n")
 
-    with open("output/computed_"+currentModel+".json", "w") as json_file:
-        json.dump(outputData, json_file, indent=4)  # "indent" for pretty-printing
+    with open("output/computed_"+current_model+".json", "w") as json_file:
+        json.dump(output, json_file, indent=4)  # "indent" for pretty-printing
 
 # we can't load .json from web javascript since we're just opening a file without running a webserver, hence we're exporting the json data to a js file.
-with open("Visualizer/computed_compilation.js", "w") as jsFile:
-    jsFile.write("const dataFile = {};\n")
-    for i, model in enumerate(availableModels):
+with open("Visualizer/computed_compilation.js", "w") as js_file:
+    js_file.write("const dataFile = {};\n")
+    for i, model in enumerate(available_models):
         try:
             with open("output/computed_"+model+".json") as f:
-                modelComputedTags = json.load(f)
+                mode_computed_tags = json.load(f)
         except:
             print("tag compilation ignoring uncomputed tags for model "+model)
             continue
-        # for each model ouput file...
 
-        jsFile.write("dataFile[\""+model+"\"] = ")
-        json.dump(modelComputedTags, jsFile)
-        jsFile.write(";\n")
+        js_file.write("dataFile[\""+model+"\"] = ")
+        json.dump(mode_computed_tags, js_file)
+        js_file.write(";\n")
 
 # finally, generate the csv files containing the texts and their metrics
 generate_sheets()
