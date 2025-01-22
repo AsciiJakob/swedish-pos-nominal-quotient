@@ -59,7 +59,7 @@ def extract_metadata(metadata_line):
         }
         return metadata
 
-def parse_file(filePath, writeDebugFile):
+def parse_file(filePath):
     try:
         document = Document(filePath)
     except:
@@ -83,8 +83,8 @@ def parse_file(filePath, writeDebugFile):
                 "sex": metadata["sex"],
                 "betyg": metadata["betyg"],
                 "format": metadata["format"],
-                "text": "",
-                "italics_marking_tokens": 0
+                "text_marked_italics": "",
+                "text_raw": ""
             })
         else:
             if (textIndx > -1):
@@ -93,25 +93,13 @@ def parse_file(filePath, writeDebugFile):
                 checkUnclosedQuote(paragraph.text)
                 checkUnclosedParanthesis(paragraph.text)
 
+                currentText["text_raw"] += paragraph.text+"\n"
+
+
                 for run in paragraph.runs:
-                    # print(run.italic)
                     if (run.italic):
-                        run.text = "<italics>"+run.text+"<\italics>"
-                        currentText["italics_marking_tokens"] += 7
-                        # print(run.text)
+                        run.text = "{ITALICS}"+run.text+"{\ITALICS}"
 
-                # print(paragraph.text)
-                currentText["text"] += paragraph.text
-
-                currentText["text"] += "\n"
-
-
-    # print("OUTPUT:\n", output)
-
+                currentText["text_marked_italics"] += paragraph.text+"\n"
     
-    if (writeDebugFile):
-        with open("DEBUG_PARSE.json", "w") as json_file:
-            json.dump(output, json_file, indent=4)  # "indent" for pretty-printing
     return output
-
-# parse_file("./input/test.docx", False)

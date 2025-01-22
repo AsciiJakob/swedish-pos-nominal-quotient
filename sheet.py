@@ -18,7 +18,7 @@ def generate_sheets():
                 model = file.split("computed_")[1].split(".json")[0]
                 with open("output/"+model+".csv", "w", newline="") as csvfile:
                     writer = csv.writer(csvfile, delimiter=";")
-                    writer.writerow(["Fil", "ID", "Nominalkvot", "Enkel nominalkvot", "Antal ord", "Genomsnittlig meningslängd", "Antal citattecken", "Citatkvot", model])
+                    writer.writerow(["Fil", "ID", "Nominalkvot", "Enkel nominalkvot", "Antal ord", "Genomsnittlig meningslängd", "Antal citattecken", "Citatkvot", "LIX", model])
 
                     try:
                         with open("output/computed_"+model+".json") as f:
@@ -38,7 +38,8 @@ def generate_sheets():
                                 text_data["word_count"],
                                 comma(text_data["mean_sentence_length"]),
                                 text_data["quote_char_count"],
-                                comma(text_data["quote_ratio"])
+                                comma(text_data["quote_ratio"]),
+                                comma(text_data["LIX"])
                             ])
                         writer.writerow([]) # we'll have one empty row between each file
         print("Generated sheets")

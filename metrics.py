@@ -1,28 +1,28 @@
 # https://sv.wikipedia.org/wiki/Nominalkvot
-def nominal_quotient(posTags):
+def nominal_quotient(pos_tags):
     # for real nominal quotient
-    numeratorTags = ["NN", "PM", "PP", "PC"]
-    denominatorTags = ["PN", "PS", "VB", "AB"]
-    fullNumerator = 0
-    fullDenominator = 0
+    numerator_tags = ["NN", "PM", "PP", "PC"]
+    denominator_tags = ["PN", "PS", "VB", "AB"]
+    full_numerator = 0
+    full_denominator = 0
 
     # for simple nominal quotient
-    simpleNouns = 0
-    simpleVerbs = 0
+    simple_nouns = 0
+    simple_verbs = 0
 
-    for taggedSentence in posTags:
-        for word in taggedSentence:
+    for tagged_sentence in pos_tags:
+        for word in tagged_sentence:
             word = word["entity_group"]
-            if (word in numeratorTags):
-                fullNumerator += 1
+            if (word in numerator_tags):
+                full_numerator += 1
                 if (word == "NN"):
-                    simpleNouns += 1
-            elif (word in denominatorTags):
-                fullDenominator += 1
+                    simple_nouns += 1
+            elif (word in denominator_tags):
+                full_denominator += 1
                 if (word == "VB"):
-                    simpleVerbs += 1
+                    simple_verbs += 1
     
-    return {"full": fullNumerator/fullDenominator, "simple": simpleNouns/simpleVerbs}
+    return {"full": full_numerator/full_denominator, "simple": simple_nouns/simple_verbs}
 
 def quote_ratio(text):
     charsInQuote = 0
@@ -32,15 +32,15 @@ def quote_ratio(text):
 
     return charsInQuote/len(text)
 
+def LIX(word_count, sentence_count, sentences):
+    long_words = 0
+    for sentence in sentences:
+        for token in sentence:
+            if (len(token["word"]) > 6):
+                long_words += 1
 
-def count_tokens(text):
-    return len(text.split())
-
-def count_quote_chars(text):
-    return text.count('"')
-
-def LIX(cWords, cSentences, cLongWords):
-    return
-
-def mean_sentence_length():
-    return
+    
+    # print("long words:", long_words)
+    # print("word_count:", word_count)
+    # print("sentence count:", sentence_count)
+    return word_count/sentence_count+(long_words*100)/word_count

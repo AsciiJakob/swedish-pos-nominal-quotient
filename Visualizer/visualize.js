@@ -197,12 +197,12 @@ function renderSentences() {
                     parenthesisDepth += 1;
                 } else if (word.word == ')') {
                     parenthesisDepth -= 1;
-                } else if (checkTokens(sentence, i, '<', '\\', "italics", '>')) {
+                } else if (checkTokens(sentence, i, '{', '\\', "ITALICS", '}')) {
                     inItalics = false;
                     wordDiv.remove();
                     i += 3; // skip this and the next 3 tokens
                     continue;
-                } else if (checkTokens(sentence, i, '<', "italics", '>')) {
+                } else if (checkTokens(sentence, i, '{', "ITALICS", '}')) {
                     inItalics = true;
                     wordDiv.remove();
                     i += 2; // skip this and the next 2 tokens
@@ -256,6 +256,7 @@ function renderSentences() {
     document.getElementById("meanSentenceLength").innerText = "Genomsnittlig meningslängd: " + currentText.mean_sentence_length.toFixed(2);
     document.getElementById("quoteCharCount").innerText = "Antal citattecken: " + currentText.quote_char_count;
     document.getElementById("quoteRatio").innerText = "Andel ord inom citat: " + (currentText.quote_ratio*10).toFixed(2) + "%";
+    document.getElementById("lix").innerText = "LIX-värde: " + (currentText.LIX).toFixed(2);
 }
 
 

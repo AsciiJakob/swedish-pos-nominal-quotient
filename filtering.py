@@ -25,11 +25,11 @@ def filter_sentences(tags, filter_quotes, filter_parenthesis, filter_italics):
                 parenthesis_depth += 1
             elif (token["word"] == ')' and filter_parenthesis):
                 parenthesis_depth -= 1
-            elif (check_tokens(taggedSentence, i, '<', "italics", '>')):
+            elif (check_tokens(taggedSentence, i, '{', "ITALICS", '}')):
                 if (filter_italics):
                     italics_depth += 1
                 skip_tokens = 2
-            elif (check_tokens(taggedSentence, i, '<', '\\', "italics", '>')):
+            elif (check_tokens(taggedSentence, i, '{', '\\', "ITALICS", '}')):
                 if (filter_italics):
                     italics_depth -= 1
                 skip_tokens = 3

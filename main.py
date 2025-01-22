@@ -30,14 +30,14 @@ for model_index, current_model in enumerate(selected_model):
     docx_files = get_folder_docx_files("input/")
     output = []
     for file_index, texts_file in enumerate(docx_files):
-        texts = parse_file(texts_file["fullPath"], False)
+        texts = parse_file(texts_file["fullPath"])
         output.append({"filename": texts_file["filename"], "texts": []})
         for text_index, text in enumerate(texts):
             print(f"Processing, model: [{model_index+1}/{len(selected_model)}] file: {texts_file["filename"]} [{file_index+1}/{len(docx_files)}] text: [{text_index+1}/{len(texts)}]", end='\r')
 
             sentence_aggregation = []
 
-            sentences = segmentize_to_sentences(text["text"])
+            sentences = segmentize_to_sentences(text["text_marked_italics"])
             for sentence in sentences:
                 sentence_aggregation.append(POSModule.pos_tag(sentence))
 
@@ -46,7 +46,7 @@ for model_index, current_model in enumerate(selected_model):
             filtered_sentences = filter_sentences(sentence_aggregation, True, True, True)
 
             nominal_quotient = metrics.nominal_quotient(filtered_sentences)
-            word_count = metrics.count_tokens(text["text"])-text["italics_marking_tokens"]
+            word_count = len(text["text_raw"].split())
 
             output[file_index]["texts"].append({
                 "id": text["id"],
@@ -56,9 +56,9 @@ for model_index, current_model in enumerate(selected_model):
                 "mean_sentence_length": word_count/len(sentences),
                 "sentences": sentence_aggregation, # this and filtered_sentences are only used for the visualizing tool so you can remove these if don't care about that and want to save storage i suppose
                 "filtered_sentences": filtered_sentences,
-                "quote_char_count": metrics.count_quote_chars(text["text"]),
-                "quote_ratio": metrics.quote_ratio(text["text"])
-                # "LIX": metrics.LIX(),
+                "quote_char_count": text["text_raw"].count('"'),
+                "quote_ratio": metrics.quote_ratio(text["text_raw"]),
+                "LIX": metrics.LIX(word_count, len(sentences), filter_sentences(sentence_aggregation, False, False, False)) # we're using filter_sentences just so "{ITALICS}" things are removed
             })
 
         print(f"Model {current_model} finished processing file {texts_file["filename"]}.docx in {round(time.time()-timestamp_start, 2)} seconds\n")
