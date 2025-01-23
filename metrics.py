@@ -22,7 +22,17 @@ def nominal_quotient(pos_tags):
                 if (word == "VB"):
                     simple_verbs += 1
     
-    return {"full": full_numerator/full_denominator, "simple": simple_nouns/simple_verbs}
+    if (full_denominator == 0):
+        full_nominal_quotient = 0
+    else:
+        full_nominal_quotient = full_numerator/full_denominator
+
+    if (simple_verbs == 0):
+        simple_nominal_quotient = 0
+    else:
+        simple_nominal_quotient = simple_nouns/simple_verbs
+
+    return {"full": full_nominal_quotient, "simple": simple_nominal_quotient}
 
 def quote_ratio(text):
     charsInQuote = 0
