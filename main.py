@@ -10,11 +10,32 @@ import importlib
 
 available_models = ["flair", "kb_bert", "kb_bert_aggregation", "kb_bert_test"]
 
-selected_model = ["kb_bert"] # set default model
+# default options
+selected_model = ["kb_bert"]
+filter_quotes = True
+filter_parenthesis = True
+filter_italics = True
+
 if (len(sys.argv) > 1):
     selected_model = sys.argv[1].split(",")
     if (selected_model[0] == "all"):
         selected_model = available_models
+    
+    if ("--tag-quotes" in sys.argv):
+        filter_quotes = False
+        print("Nominal quotient will include words in quotes")
+    if ("--tag-parenthesis" in sys.argv):
+        filter_parenthesis = False
+        print("Nominal quotient will include words in parenthesis")
+    if ("--tag-italics" in sys.argv):
+        filter_italics = False
+        print("Nominal quotient will include words in italics")
+    if ("--tag-all" in sys.argv):
+        filter_quotes = False
+        filter_italics = False
+        filter_parenthesis = False
+        print("Nominal quotient will include all words in quotes, parenthesis and italics.")
+
 
 for model_index, current_model in enumerate(selected_model):
     print("Attempting to load model", current_model)
@@ -42,23 +63,26 @@ for model_index, current_model in enumerate(selected_model):
                 sentence_aggregation.append(POSModule.pos_tag(sentence))
 
             # Apply filtering to remove words in quotes, parenthesis or italics.
-            # Also removes <italics> tags from the text so they don't distrub metrics, we only need that information if we're filtering italics out.
-            filtered_sentences = filter_sentences(sentence_aggregation, True, True, True)
+            # Also removes {ITALICS} tags from the text so they don't distrub metrics, we only need that information if we're filtering italics out.
+            filtered_sentences = filter_sentences(sentence_aggregation, filter_quotes, filter_parenthesis, filter_italics)
 
             nominal_quotient = metrics.nominal_quotient(filtered_sentences)
-            word_count = len(text["text_raw"].split())
+            tokenized_sentences = filter_sentences(sentence_aggregation, False, False, False)
+            token_count = sum(len(sentence) for sentence in tokenized_sentences)
 
             output[file_index]["texts"].append({
                 "id": text["id"],
                 "full_nominal_quotient": nominal_quotient["full"],
                 "simple_nominal_quotient": nominal_quotient["simple"],
-                "word_count": word_count,
-                "mean_sentence_length": word_count/len(sentences),
+                "token_count": token_count,
+                "mean_sentence_length": token_count/len(sentences),
                 "sentences": sentence_aggregation, # this and filtered_sentences are only used for the visualizing tool so you can remove these if don't care about that and want to save storage i suppose
                 "filtered_sentences": filtered_sentences,
                 "quote_char_count": text["text_raw"].count('"'),
                 "quote_ratio": metrics.quote_ratio(text["text_raw"]),
-                "LIX": metrics.LIX(word_count, len(sentences), filter_sentences(sentence_aggregation, False, False, False)) # we're using filter_sentences just so "{ITALICS}" things are removed
+                "LIX": metrics.LIX(token_count, len(sentences), tokenized_sentences), # we're using filter_sentences just so any "{ITALICS}" things are removed
+                "OVIX": metrics.OVIX(token_count, tokenized_sentences)
+
             })
 
         print(f"Model {current_model} finished processing file {texts_file["filename"]}.docx in {round(time.time()-timestamp_start, 2)} seconds\n")

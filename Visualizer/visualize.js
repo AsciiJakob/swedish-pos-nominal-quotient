@@ -252,11 +252,12 @@ function renderSentences() {
     document.getElementById("verbNounCount").innerText = "Verb: "+countVerbs+" substantiv: "+countNouns;
     document.getElementById("fullNominalQuotient").innerText = "Full nominalkvot: " + currentText.full_nominal_quotient.toFixed(3);
     document.getElementById("simpleNominalQuotient").innerText = "Enkel nominalkvot: " + currentText.simple_nominal_quotient.toFixed(3);
-    document.getElementById("wordCount").innerText = "Antal ord: " + currentText.word_count;
+    document.getElementById("tokenCount").innerText = "Antal tokens: " + currentText.token_count;
     document.getElementById("meanSentenceLength").innerText = "Genomsnittlig meningslängd: " + currentText.mean_sentence_length.toFixed(2);
     document.getElementById("quoteCharCount").innerText = "Antal citattecken: " + currentText.quote_char_count;
-    document.getElementById("quoteRatio").innerText = "Andel ord inom citat: " + (currentText.quote_ratio*10).toFixed(2) + "%";
+    document.getElementById("quoteRatio").innerText = "Andel tokens inom citat: " + (currentText.quote_ratio*10).toFixed(2) + "%";
     document.getElementById("lix").innerText = "LIX-värde: " + (currentText.LIX).toFixed(2);
+    document.getElementById("ovix").innerText = "OVIX-värde: " + (currentText.OVIX).toFixed(2);
 }
 
 

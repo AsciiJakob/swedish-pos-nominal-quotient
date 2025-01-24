@@ -1,3 +1,5 @@
+import math
+
 # https://sv.wikipedia.org/wiki/Nominalkvot
 def nominal_quotient(pos_tags):
     # for real nominal quotient
@@ -42,15 +44,38 @@ def quote_ratio(text):
 
     return charsInQuote/len(text)
 
-def LIX(word_count, sentence_count, sentences):
+def LIX(token_count, sentence_count, sentences):
     long_words = 0
     for sentence in sentences:
         for token in sentence:
             if (len(token["word"]) > 6):
                 long_words += 1
 
-    
     # print("long words:", long_words)
     # print("word_count:", word_count)
     # print("sentence count:", sentence_count)
-    return word_count/sentence_count+(long_words*100)/word_count
+    assert token_count > 0, print("Error: text with no words.")
+    return token_count/sentence_count+(long_words*100)/token_count
+
+
+def OVIX(token_count, sentences):
+    types = 0
+    unique_word_encounters = []
+    for sentence in sentences:
+        for token in sentence:
+            if (not token["word"] in unique_word_encounters):
+                types += 1
+                unique_word_encounters.append(token["word"])
+            
+    
+    
+    # print("tokens:", token_count)
+    # print("types:", types)
+    
+    numerator = math.log(token_count)
+    denominator = math.log(2-(math.log(types)/math.log(token_count))) 
+    if (denominator == 0):
+        denominator = 1
+        numerator = 0
+
+    return numerator/denominator
