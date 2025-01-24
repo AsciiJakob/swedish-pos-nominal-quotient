@@ -39,7 +39,8 @@ def filter_sentences(tags, filter_quotes, filter_parenthesis, filter_italics):
             assert parenthesis_depth >= 0, "Fatal error: parenthesis_depth should never be < 0"
             # else:
                 # print("ignoring: ", token["word"])
-        output.append(output_sentence)
+        if len(output_sentence) > 0:
+            output.append(output_sentence)
     assert parenthesis_depth == 0, "Fatal error: text ended without parenthesis being closed off"
     assert italics_depth == 0, "Fatal error: text ended without italics being closed off. This would mean we failed to find at least one ending italics tag."
 
