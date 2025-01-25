@@ -44,21 +44,22 @@ def quote_ratio(text):
 
     return charsInQuote/len(text)
 
-def LIX(token_count, sentence_count, sentences):
+def LIX(word_count, sentence_count, sentences):
     long_words = 0
     for sentence in sentences:
         for token in sentence:
             if (len(token["word"]) > 6):
                 long_words += 1
+            print(token)
 
     # print("long words:", long_words)
     # print("word_count:", word_count)
     # print("sentence count:", sentence_count)
-    assert token_count > 0, print("Error: text with no words.")
-    return token_count/sentence_count+(long_words*100)/token_count
+    assert word_count > 0, print("Error: text with no words.")
+    return word_count/sentence_count+(long_words*100)/word_count
 
 
-def OVIX(token_count, sentences):
+def OVIX(word_count, sentences):
     types = 0
     unique_word_encounters = []
     for sentence in sentences:
@@ -72,8 +73,8 @@ def OVIX(token_count, sentences):
     # print("tokens:", token_count)
     # print("types:", types)
     
-    numerator = math.log(token_count)
-    denominator = math.log(2-(math.log(types)/math.log(token_count))) 
+    numerator = math.log(word_count)
+    denominator = math.log(2-(math.log(types)/math.log(word_count))) 
     if (denominator == 0):
         denominator = 1
         numerator = 0

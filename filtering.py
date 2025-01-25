@@ -4,6 +4,22 @@ def check_tokens(taggedSentence, base, *args):
             return False
     return True
 
+def remove_nonwords(sentences):
+    ignore_types = ["MAD", "PAD", "MID"]
+    ignore_chars = ['-', '.', ''] # for some reason sometimes these don't fall into the types on the line above
+    output = []
+    for sentence in sentences:
+        outputSentence = []
+        for token in sentence:
+            if (not token["entity_group"] in ignore_types and not token["word"] in ignore_chars):
+                outputSentence.append(token)
+            # else:
+            #     print(token["word"])
+        output.append(outputSentence)
+    return output
+
+
+
 def filter_sentences(tags, filter_quotes, filter_parenthesis, filter_italics):
     output = []
     skip_tokens = 0

@@ -1,7 +1,7 @@
 from segmentation import segmentize_to_sentences
 from parsing import parse_file, get_folder_docx_files
 from sheet import generate_sheets
-from filtering import filter_sentences
+from filtering import filter_sentences, remove_nonwords
 import metrics as metrics
 import json
 import sys
@@ -67,21 +67,21 @@ for model_index, current_model in enumerate(selected_model):
             filtered_sentences = filter_sentences(sentence_aggregation, filter_quotes, filter_parenthesis, filter_italics)
 
             nominal_quotient = metrics.nominal_quotient(filtered_sentences)
-            tokenized_sentences = filter_sentences(sentence_aggregation, False, False, False)
-            token_count = sum(len(sentence) for sentence in tokenized_sentences)
+            sentences_just_words = remove_nonwords(filter_sentences(sentence_aggregation, False, False, False))
+            word_count = sum(len(sentence) for sentence in sentences_just_words)
 
             output[file_index]["texts"].append({
                 "id": text["id"],
                 "full_nominal_quotient": nominal_quotient["full"],
                 "simple_nominal_quotient": nominal_quotient["simple"],
-                "token_count": token_count,
-                "mean_sentence_length": token_count/len(sentences),
+                "word_count": word_count,
+                "mean_sentence_length": word_count/len(sentences),
                 "sentences": sentence_aggregation, # this and filtered_sentences are only used for the visualizing tool so you can remove these if don't care about that and want to save storage i suppose
                 "filtered_sentences": filtered_sentences,
                 "quote_char_count": text["text_raw"].count('"'),
                 "quote_ratio": metrics.quote_ratio(text["text_raw"]),
-                "LIX": metrics.LIX(token_count, len(sentences), tokenized_sentences), # we're using filter_sentences just so any "{ITALICS}" things are removed
-                "OVIX": metrics.OVIX(token_count, tokenized_sentences)
+                "LIX": metrics.LIX(word_count, len(sentences), sentences_just_words), # we're using filter_sentences just so any "{ITALICS}" things are removed
+                "OVIX": metrics.OVIX(word_count, sentences_just_words)
 
             })
 
