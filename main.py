@@ -63,10 +63,10 @@ for model_index, current_model in enumerate(selected_model):
                 sentence_aggregation.append(POSModule.pos_tag(sentence))
 
             # Apply filtering to remove words in quotes, parenthesis or italics.
-            # Also removes {ITALICS} tags from the text so they don't distrub metrics, we only need that information if we're filtering italics out.
-            filtered_sentences = filter_sentences(sentence_aggregation, filter_quotes, filter_parenthesis, filter_italics)
-
+            # filter_sentences also removes {ITALICS} tags from the text so they don't distrub metrics, we only need that information if we're filtering italics out.
+            filtered_sentences = remove_nonwords(filter_sentences(sentence_aggregation, filter_quotes, filter_parenthesis, filter_italics))
             nominal_quotient = metrics.nominal_quotient(filtered_sentences)
+
             sentences_just_words = remove_nonwords(filter_sentences(sentence_aggregation, False, False, False))
             word_count = sum(len(sentence) for sentence in sentences_just_words)
 
@@ -80,9 +80,8 @@ for model_index, current_model in enumerate(selected_model):
                 "filtered_sentences": filtered_sentences,
                 "quote_char_count": text["text_raw"].count('"'),
                 "quote_ratio": metrics.quote_ratio(text["text_raw"]),
-                "LIX": metrics.LIX(word_count, len(sentences), sentences_just_words), # we're using filter_sentences just so any "{ITALICS}" things are removed
+                "LIX": metrics.LIX(word_count, len(sentences), sentences_just_words),
                 "OVIX": metrics.OVIX(word_count, sentences_just_words)
-
             })
 
         print(f"Model {current_model} finished processing file {texts_file["filename"]}.docx in {round(time.time()-timestamp_start, 2)} seconds\n")

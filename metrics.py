@@ -4,7 +4,9 @@ import math
 def nominal_quotient(pos_tags):
     # for real nominal quotient
     numerator_tags = ["NN", "PM", "PP", "PC"]
+    # numerator_tags = ["NN", "PP", "PC"]
     denominator_tags = ["PN", "PS", "VB", "AB"]
+    # denominator_tags = ["PN", "VB", "AB"]
     full_numerator = 0
     full_denominator = 0
 
