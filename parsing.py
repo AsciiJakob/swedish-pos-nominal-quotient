@@ -96,9 +96,9 @@ def parse_file(filePath):
                 currentText["text_raw"] += paragraph.text+"\n"
 
 
-                for run in paragraph.runs:
-                    if (run.italic):
-                        run.text = "{ITALICS}"+run.text+"{\\ITALICS}"
+                # for run in paragraph.runs:
+                #     if (run.italic and not run.text.isspace()):
+                #         run.text = "{ITALICS}"+run.text+"{\\ITALICS}"
 
                 currentText["text_marked_italics"] += paragraph.text+"\n"
     

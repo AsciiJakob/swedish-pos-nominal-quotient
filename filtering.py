@@ -6,7 +6,7 @@ def check_tokens(taggedSentence, base, *args):
 
 def remove_nonwords(sentences):
     ignore_types = ["MAD", "PAD", "MID"]
-    ignore_chars = ['-', '.', ''] # for some reason sometimes these don't fall into the types on the line above
+    ignore_chars = ['-', '.', '–', '/'] # for some reason sometimes these don't fall into the types on the line above
     output = []
     for sentence in sentences:
         outputSentence = []
