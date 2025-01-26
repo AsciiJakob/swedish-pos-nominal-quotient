@@ -20,7 +20,6 @@ def pos_tag(sentence):
     current_end = None
 
     for token in pos_pipeline(sentence):
-        print(token)
         word = token["word"]
         entity = token["entity"]
         start = token["start"]

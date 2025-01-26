@@ -19,7 +19,6 @@ def remove_nonwords(sentences):
     return output
 
 
-
 def filter_sentences(tags, filter_quotes, filter_parenthesis, filter_italics):
     output = []
     skip_tokens = 0

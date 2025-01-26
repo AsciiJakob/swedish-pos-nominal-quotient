@@ -3,60 +3,51 @@ from transformers import pipeline
 import json
 import torch
 
-# Check if GPU is available
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {device}")
-
-# Load the tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained("KB/bert-base-swedish-cased-pos")
 model = AutoModelForTokenClassification.from_pretrained("KB/bert-base-swedish-cased-pos")
 
-# Create the pipeline for POS tagging
-# pos_pipeline = pipeline("token-classification", model=model, tokenizer=tokenizer, aggregation_strategy="none")
-useDevice = 0 if torch.cuda.is_available() else -1
+
+useDevice = 0 if torch.cuda.is_available() else -1 # Use GPU if available
 pos_pipeline = pipeline("token-classification", model=model, tokenizer=tokenizer, device=useDevice, aggregation_strategy="none")
 
+def merge_hyphenated_words(sentence):
+    output = []
+    skip_tokens = 0
 
+    for i, token in enumerate(sentence):
+        if (skip_tokens > 0):
+            skip_tokens -= 1
+            continue
+        if (token["word"] == '-'):
+            word_before = sentence[i-1]
+            word_after = sentence[i+1]
+            if (word_before["entity_group"] == "NN" and word_after["entity_group"] == "NN"):
+                word_before["word"] += "-"+word_after["word"]
+                skip_tokens = 1
+                continue
+        output.append(token)
+
+    return output
 
 def pos_tag(sentence):
     output = []
-    current_word = ""
-    current_entity = ""
-    current_start = None
-    current_end = None
 
-    for token in pos_pipeline(sentence):
+    pos_tokens = pos_pipeline(sentence)
+    last_added_token = ""
+
+    # merge subwords (tokens that are part of the same word have "##" as a prefix to them)
+    for i, token in enumerate(pos_tokens):
         word = token["word"]
-        entity = token["entity"]
-        start = token["start"]
-        end = token["end"]
-        
-        # If the word starts with '##', it's a subword and should be appended to the previous word
-        if word.startswith("##"):
-            current_word += word[2:]  # Add subword part to the current word (excluding '##')
-            current_end = end  # Update the end position
+        if word.startswith("##") and i != 0:
+            last_added_token["word"] += word[2:]
         else:
-            # If we already have a current word, append it to the output before starting a new one
-            if current_word:
-                output.append({
-                    "entity_group": current_entity,
-                    "word": current_word,
-                    "start": current_start,
-                    "end": current_end
-                })
-            # Start a new word
-            current_word = word
-            current_entity = entity
-            current_start = start
-            current_end = end
+            output.append({
+                "entity_group": token["entity"],
+                "word": word
+            })
+            last_added_token = output[-1] # last element in array
     
-    # Append the last word after finishing the loop
-    if current_word:
-        output.append({
-            "entity_group": current_entity,
-            "word": current_word,
-            "start": current_start,
-            "end": current_end
-        })
+
+    output = merge_hyphenated_words(output)
 
     return output

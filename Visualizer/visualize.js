@@ -6,6 +6,9 @@ const params = new URLSearchParams(window.location.search);
 let currentModel = params.get("model") || Object.keys(dataFile)[0];
 let currentFile = params.get("fileID") || 0 
 let currentTextID = params.get("textID") || 0;
+if (dataFile[currentModel] == undefined) {
+    currentModel = Object.keys(dataFile)[0];
+}
 if (dataFile[currentModel][currentFile] == undefined) {
     currentFile = 0;
     currentTextID = 0;

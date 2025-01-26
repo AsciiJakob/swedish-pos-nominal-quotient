@@ -52,7 +52,6 @@ def LIX(word_count, sentence_count, sentences):
         for token in sentence:
             if (len(token["word"]) > 6):
                 long_words += 1
-            print(token)
 
     # print("long words:", long_words)
     # print("word_count:", word_count)
