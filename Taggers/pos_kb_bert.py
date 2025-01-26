@@ -21,7 +21,7 @@ def merge_hyphenated_words(sentence):
         if (token["word"] == '-'):
             word_before = sentence[i-1]
             word_after = sentence[i+1]
-            if (word_before["entity_group"] == "NN" and word_after["entity_group"] == "NN"):
+            if (word_before["pos"] == "NN" and word_after["pos"] == "NN"):
                 word_before["word"] += "-"+word_after["word"]
                 skip_tokens = 1
                 continue
@@ -42,7 +42,7 @@ def pos_tag(sentence):
             last_added_token["word"] += word[2:]
         else:
             output.append({
-                "entity_group": token["entity"],
+                "pos": token["entity"],
                 "word": word
             })
             last_added_token = output[-1] # last element in array

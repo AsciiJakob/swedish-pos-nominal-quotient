@@ -21,7 +21,7 @@ for file in only_files:
                 for text in file_data["texts"]:
                     for sentence in text["filtered_sentences"]:
                         for token in sentence:
-                            if token["entity_group"] == "UO":
+                            if token["pos"] == "UO":
                                 output.append(f"{token["word"]} [{text["id"]}]\n")
 
 with open(folder_path+"foreign_words.txt", "w", encoding="utf-8") as file:

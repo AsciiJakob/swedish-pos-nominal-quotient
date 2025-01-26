@@ -11,8 +11,8 @@ def comma(value):
     return locale.format_string("%.12f", value)
 
 def generate_sheets():
-        folderPath = "output/"
-        only_files = [f for f in listdir(folderPath) if isfile(join(folderPath, f))]
+        folder_path = "output/"
+        only_files = [f for f in listdir(folder_path) if isfile(join(folder_path, f))]
         for file in only_files:
             if (file.startswith("computed_") and file.endswith(".json")):
                 model = file.split("computed_")[1].split(".json")[0]
@@ -22,12 +22,12 @@ def generate_sheets():
 
                     try:
                         with open("output/computed_"+model+".json") as f:
-                            computedData = json.load(f)
+                            computed_data = json.load(f)
                     except:
                         print("missing file for model", model)
                         exit(1)
                     
-                    for file_data in computedData:
+                    for file_data in computed_data:
                         filename = file_data["filename"]
                         for text_data in file_data["texts"]:
                             writer.writerow([

@@ -16,7 +16,7 @@ def nominal_quotient(pos_tags):
 
     for tagged_sentence in pos_tags:
         for word in tagged_sentence:
-            word = word["entity_group"]
+            word = word["pos"]
             if (word in numerator_tags):
                 full_numerator += 1
                 if (word == "NN"):

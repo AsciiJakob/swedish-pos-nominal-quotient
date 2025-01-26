@@ -8,7 +8,7 @@ import sys
 import time
 import importlib
 
-available_models = ["flair", "kb_bert", "kb_bert_aggregation", "kb_bert_test"]
+available_models = ["flair", "kb_bert"]
 
 # default options
 selected_model = ["kb_bert"]

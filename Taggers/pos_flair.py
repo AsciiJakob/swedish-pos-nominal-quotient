@@ -32,8 +32,8 @@ def pos_tag(sentence):
                 assert not char.isalpha(), "Fatal error: unsure how to split combined tokens with alpha characters"
 
                 # word_class won't be exactly right, but only the classes of words are cared about in this project
-                output.append({"entity_group": word_class, "word": char})
+                output.append({"pos": word_class, "word": char})
         else:
-            output.append({"entity_group": word_class, "word": word})
+            output.append({"pos": word_class, "word": word})
 
     return output 

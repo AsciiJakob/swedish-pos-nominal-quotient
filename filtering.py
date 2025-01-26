@@ -11,7 +11,7 @@ def remove_nonwords(sentences):
     for sentence in sentences:
         outputSentence = []
         for token in sentence:
-            if (not token["entity_group"] in ignore_types and not token["word"] in ignore_chars):
+            if (not token["pos"] in ignore_types and not token["word"] in ignore_chars):
                 outputSentence.append(token)
             # else:
             #     print(token["word"])

@@ -29,7 +29,6 @@ renderSentences();
 
 // store application states in url since refreshing is great but losing your state isn't.
 function updateURL() {
-    // const newUrl = `?model=${encodeURIComponent(currentModel)}&textID=${encodeURIComponent(currentTextID)}`;
     const newUrl = `?model=${encodeURIComponent(currentModel)}&fileID=${encodeURIComponent(currentFile)}&textID=${encodeURIComponent(currentTextID)}&markIgnored=${encodeURIComponent(markIgnored)}&pythonFiltering=${encodeURIComponent(loadPythonFiltering)}`;
     window.history.pushState(null, '', newUrl);
 }
@@ -185,7 +184,6 @@ function renderSentences() {
             wordDiv.classList = "tooltip";
             wordDiv.innerText = word.word;
 
-            
             if (markIgnored) {
                 if (inQuote || parenthesisDepth != 0)
                     wordDiv.classList+=" ignored";
@@ -217,30 +215,30 @@ function renderSentences() {
             }
 
             if (!markIgnored | (!inQuote && !inItalics && parenthesisDepth == 0)) {
-                if (numerator.includes(word.entity_group)) {
+                if (numerator.includes(word.pos)) {
                     wordDiv.classList+=" numerator"
                 }
-                if (denominator.includes(word.entity_group)) {
+                if (denominator.includes(word.pos)) {
                     wordDiv.classList+=" denominator"
                 }
 
-                if (word.entity_group == "NN")
+                if (word.pos == "NN")
                     countNouns++;
-                if (word.entity_group == "VB")
+                if (word.pos == "VB")
                     countVerbs++;
             }
 
             const tooltip = document.createElement("span");
             tooltip.classList = "tooltipText";
-            tooltip.innerText = word.entity_group;
-            const full = fullTagName(word.entity_group);
+            tooltip.innerText = word.pos;
+            const full = fullTagName(word.pos);
             if (full != undefined)
                 tooltip.innerText += ": "+full;
             
             
             wordDiv.appendChild(tooltip);
             sentenceElement.appendChild(wordDiv);
-            if (i != sentence.length-1 && sentence[i+1].entity_group != "MAD") {
+            if (i != sentence.length-1 && sentence[i+1].pos != "MAD") {
                 sentenceElement.innerHTML += " "
             }
         }
@@ -262,7 +260,6 @@ function renderSentences() {
     document.getElementById("lix").innerText = "LIX-värde: " + (currentText.LIX).toFixed(2);
     document.getElementById("ovix").innerText = "OVIX-värde: " + (currentText.OVIX).toFixed(2);
 }
-
 
 document.addEventListener("keydown", (event) => {
     const modelKeys = Object.keys(dataFile);

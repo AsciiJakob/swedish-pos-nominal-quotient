@@ -4,39 +4,28 @@ import json
 from os import listdir
 from os.path import isfile, join
 
-# def checkUnclosedQuotes(text, textobj):
-#     leftQuoteCount = text.count('"')
-#     if (leftQuoteCount % 2 != 0):
-#             print("Note: found unclosed quote in text ", textobj["id"])
-#             print("[\n", text, "\n]")
-def checkUnclosedQuote(text):
+def check_unclosed_quote(text):
     if (text.count('"') % 2 != 0):
         print("\nFound unclosed quote in:\n", text)
         exit(1)
 
-# def checkUnclosedParenthesis(text, textobj):
-#     leftQuoteCount = text.count("(")
-#     if (leftQuoteCount != text.count(")")):
-#             print("Note: found unclosed paranthesis in text ", textobj["id"])
-#             print("[\n", text, "\n]")
-
-def checkUnclosedParanthesis(text):
+def check_unclosed_parenthesis(text):
     if (text.count("(") != text.count(")")):
         print("\nFound unclosed paranthesis in:\n", text)
         exit(1)
 
 
-# Regex pattern. 11 segments of data seperated by space and start/ending with < and >
+# Regex pattern. 11 segments of data seperated by space and starting/ending with < and >
 metadata_pattern = re.compile(r"<(\w+)\s+(\w+)\s+(\w+)\s+(\w+)\s+(\w)\s+(\w)\s+(\w+)\s+(\w+)\s+(\w)\s+(\w)\s+(\w)>")
 
-def get_folder_docx_files(folderPath):
-    onlyfiles = [f for f in listdir(folderPath) if isfile(join(folderPath, f))]
+def get_folder_docx_files(folder_path):
+    only_files = [f for f in listdir(folder_path) if isfile(join(folder_path, f))]
     output = []
-    for file in onlyfiles:
+    for file in only_files:
         if (file.endswith(".docx")):
-            if (not folderPath.endswith("/")):
-                folderPath += "/"
-            output.append({"fullPath": folderPath+file, "filename": file.replace(".docx", "")})
+            if (not folder_path.endswith("/")):
+                folder_path += "/"
+            output.append({"fullPath": folder_path+file, "filename": file.replace(".docx", "")})
     return output
 
 def extract_metadata(metadata_line):
@@ -59,24 +48,23 @@ def extract_metadata(metadata_line):
         }
         return metadata
 
-def parse_file(filePath):
+def parse_file(file_path):
     try:
-        document = Document(filePath)
+        document = Document(file_path)
     except:
-        print("failed to parse file path:", filePath)
+        print("failed to parse file path:", file_path)
         exit(1)
 
-    textIndx = -1 # start at -1 so that it becomes 0 for the first actual text after it gets incremented for the first metadata
+    text_index = -1 # start at -1 so that it becomes 0 for the first actual text after it gets incremented for the first metadata
     output = []
-    parsedFirstMetadata = False
     for paragraph in document.paragraphs:
         stripped = paragraph.text.strip() # strip trailing whitespace
         if (stripped.startswith("<") and stripped.endswith(">")):
-            textIndx+=1 
+            text_index+=1 
 
             metadata = extract_metadata(paragraph.text)
             if (metadata == None):
-                print("Failed to parse metadata in file", filePath ,"for paragraph:", paragraph.text)
+                print("Failed to parse metadata in file", file_path ,"for paragraph:", paragraph.text)
                 exit(1)
             output.append({
                 "id": metadata["löpnr"],
@@ -87,19 +75,19 @@ def parse_file(filePath):
                 "text_raw": ""
             })
         else:
-            if (textIndx > -1):
-                currentText = output[textIndx]
+            if (text_index > -1):
+                current_text = output[text_index]
 
-                checkUnclosedQuote(paragraph.text)
-                checkUnclosedParanthesis(paragraph.text)
+                check_unclosed_quote(paragraph.text)
+                check_unclosed_parenthesis(paragraph.text)
 
-                currentText["text_raw"] += paragraph.text+"\n"
+                current_text["text_raw"] += paragraph.text+"\n"
 
 
-                # for run in paragraph.runs:
-                #     if (run.italic and not run.text.isspace()):
-                #         run.text = "{ITALICS}"+run.text+"{\\ITALICS}"
+                for run in paragraph.runs:
+                    if (run.italic and not run.text.isspace()):
+                        run.text = "{ITALICS}"+run.text+"{\\ITALICS}"
 
-                currentText["text_marked_italics"] += paragraph.text+"\n"
+                current_text["text_marked_italics"] += paragraph.text+"\n"
     
     return output
