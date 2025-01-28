@@ -3,10 +3,10 @@ import math
 # https://sv.wikipedia.org/wiki/Nominalkvot
 def nominal_quotient(pos_tags):
     # for real nominal quotient
-    numerator_tags = ["NN", "PM", "PP", "PC"]
-    # numerator_tags = ["NN", "PP", "PC"]
-    denominator_tags = ["PN", "PS", "VB", "AB"]
-    # denominator_tags = ["PN", "VB", "AB"]
+    # numerator_tags = ["NN", "PM", "PP", "PC"]
+    numerator_tags = ["NN", "PP", "PC"]
+    # denominator_tags = ["PN", "PS", "VB", "AB"]
+    denominator_tags = ["PN", "VB", "AB"]
     full_numerator = 0
     full_denominator = 0
 
@@ -39,12 +39,12 @@ def nominal_quotient(pos_tags):
     return {"full": full_nominal_quotient, "simple": simple_nominal_quotient}
 
 def quote_ratio(text):
-    charsInQuote = 0
+    chars_in_quote = 0
     for i, s in enumerate(text.split('"')):
         if (i % 2 != 0): # 0: start of the text, not in quote. 1: first quote. 2: after the quote ends. etc
-            charsInQuote += len(s) 
+            chars_in_quote += len(s) 
 
-    return charsInQuote/len(text)
+    return chars_in_quote/len(text)
 
 def LIX(word_count, sentence_count, sentences):
     long_words = 0
