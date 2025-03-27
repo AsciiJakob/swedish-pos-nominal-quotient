@@ -1,6 +1,8 @@
 const textContent = document.getElementById("textContent");
-const numerator = ["NN", "PM", "PP", "PC"];
-const denominator = ["PN", "PS", "VB", "AB"];
+// const numerator = ["NN", "PM", "PP", "PC"];
+const numerator = ["NN", "PP", "PC"];
+// const denominator = ["PN", "PS", "VB", "AB"];
+const denominator = ["PN", "VB", "AB"];
 
 const params = new URLSearchParams(window.location.search);
 let currentModel = params.get("model") || Object.keys(dataFile)[0];
