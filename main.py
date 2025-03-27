@@ -68,7 +68,11 @@ for model_index, current_model in enumerate(selected_model):
             nominal_quotient = metrics.nominal_quotient(filtered_sentences)
 
             sentences_just_words = remove_nonwords(filter_sentences(sentence_aggregation, False, False, False))
-            word_count = sum(len(sentence) for sentence in sentences_just_words)
+            word_count = 0
+            character_count = 0
+            for sentence in sentences_just_words:
+                word_count += len(sentence)
+                character_count += sum(len(token["word"]) for token in sentence)
 
             output[file_index]["texts"].append({
                 "id": text["id"],
@@ -81,7 +85,9 @@ for model_index, current_model in enumerate(selected_model):
                 "quote_char_count": text["text_raw"].count('"'),
                 "quote_ratio": metrics.quote_ratio(text["text_raw"]),
                 "LIX": metrics.LIX(word_count, len(sentences), sentences_just_words),
-                "OVIX": metrics.OVIX(word_count, sentences_just_words)
+                "OVIX": metrics.OVIX(word_count, sentences_just_words),
+                "character_count": character_count,
+                "mean_word_length": character_count/word_count
             })
 
         print(f"Model {current_model} finished processing file {texts_file["filename"]}.docx in {round(time.time()-timestamp_start, 2)} seconds\n")
