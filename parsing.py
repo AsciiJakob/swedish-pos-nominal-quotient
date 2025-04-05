@@ -39,7 +39,7 @@ def extract_metadata(metadata_line):
             "termin_år": fields[2], # termin/år
             "genre": fields[3], 
             "betyg": fields[4],
-            "sex": fields[5], # K=kvinna, M=man
+            "sex": fields[5], # K=kvinna, M=man. Skrivits på engelska eftersom åäö (ordet "kön") skapar problem när de outputtas
             "ämne": fields[6], # SV=svenska 
             "et_t": fields[7], #ET=ej tillstånd, T=tillstånd finns. Irrelevant eftersom de inte kommer publiceras
             "program": fields[8], # _ (saknas)
