@@ -4,7 +4,10 @@ A program for calculating various text metrics such as nominal ratio, word varia
 
 The texts that were used by the study are confidential, though I have supplied some example texts that I've written myself for anyone looking to test the program. If you just want to test the visualizer tool you don't have to run anything as I pushed part of the program output (when ran with the example) to the repo, just open the index.html in /Visualizer and you can look at the examples. 
 ## Screenshots
-
+Example showing the visualizer tool. Green words are considered a part of the nominal word groups and placed in the numerator of the nominal ratio/quotient, while orange ones are placed in the denominator. A linebreak is made for each new sentence.
+![](README_images/visualizerExample.png)
+Example showing the programs outputted spreadshet when ran with the example texts
+![](README_images/spreadsheetExample.png)
 
 # Usage
 ## Input files 
